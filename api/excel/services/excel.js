@@ -27,8 +27,7 @@ module.exports = {
 
       if (!fs.existsSync(templateFileName)) {
         templateFileName = path.join(
-          strapi.dir,
-          "storage",
+          strapi.config.app.storage,
           "templates",
           "xlsx",
           templateFileName
@@ -38,8 +37,7 @@ module.exports = {
       const buffer = await xlsxBuildByTemplate(values, templateFileName)
       const outputFile = path.join(uuid.v4(), path.basename(templateFileName))
       const downloadFilePath = path.join(
-        strapi.dir,
-        "storage",
+        strapi.config.app.storage,
         "download",
         outputFile
       )
@@ -85,8 +83,7 @@ module.exports = {
       )
 
       const downloadFilePath = path.join(
-        strapi.dir,
-        "storage",
+        strapi.config.app.storage,
         "download",
         fileName
       )
