@@ -43,11 +43,11 @@ program
   .description("Set ENV in Strapi application")
   .action(getLocalScript("dotenv"))
 
-// `$ strapi start`
+// `$ strapi production`
 program
-  .command("start")
+  .command("production")
   .description("Start your Strapi application")
-  .action(getLocalScript("start"))
+  .action(getLocalScript("production"))
 
 // `$ strapi develop`
 program

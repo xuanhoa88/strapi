@@ -12,10 +12,8 @@
 ## Frameworks
 
 - [Strapi](https://strapi.io) Web application framework based on [Koa.js](http://koajs.com)
+- [Knex](https://knexjs.org) — SQL query builder for PostgreSQL, CockroachDB, MSSQL, MySQL, MariaDB, SQLite3, Better-SQLite3, Oracle, and Amazon Redshift 
 - [Bookshelf](http://bookshelfjs.org) — ORM Mapping
-- [Passport](https://passportjs.org) — Authentication
-- [Redis](http://redis.io) — Session storage
-- [RabbitMQ](https://rabbitmq.com) — Queue to communicate with 3rd party APIs
 
 ## Setup
 
@@ -36,15 +34,11 @@ npm run dev
 ```
 ├── api
 │   ├── app
-│   │   ├── config
-│   │   ├── controllers
-│   │   └── policies       -> Global policies
-│   ├── ...
-│   ├── api
 │   │   ├── config         -> URL Routes
 │   │   ├── controllers    -> Controllers binding actions to services
 │   │   ├── models         -> Model definition, hooks & computed properties
 │   │   └── services       -> Global available model service
+│   ├── ...
 ├── config
 │   ├── environments
 │   │   ├── development

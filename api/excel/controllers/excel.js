@@ -4,11 +4,6 @@
  */
 
 module.exports = {
-  async find(ctx) {
-    ctx.body = {
-      success: true,
-    }
-  },
   async create(ctx) {
     try {
       ctx.body = await strapi.services.excel.createFromTemplate(

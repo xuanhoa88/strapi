@@ -1,12 +1,15 @@
 const assert = require("assert")
 const path = require("path")
 const fs = require("fs")
+const { isNotJunk } = require("../utils/junk")
 
 function walk(dir, { loader } = {}) {
   assert(typeof loader === "function", "opts.loader must be a function")
 
   const root = {}
-  const paths = fs.readdirSync(dir, { withFileTypes: true })
+  const paths = fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((file) => file.isFile() && isNotJunk(file.name))
 
   for (const fd of paths) {
     const { name } = fd

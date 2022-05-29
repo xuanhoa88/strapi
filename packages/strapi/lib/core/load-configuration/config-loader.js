@@ -1,19 +1,7 @@
 const path = require("path")
 const fs = require("fs")
 const { templateConfiguration, env } = require("@strapi/utils")
-
-const loadFile = (file) => {
-  const ext = path.extname(file)
-
-  switch (ext) {
-    case ".js":
-      return loadJsFile(file)
-    case ".json":
-      return loadJSONFile(file)
-    default:
-      return {}
-  }
-}
+const { isNotJunk } = require("../../utils/junk")
 
 const loadJsFile = (file) => {
   try {
@@ -38,17 +26,28 @@ const loadJSONFile = (file) => {
   }
 }
 
+const loadFile = (file) => {
+  const ext = path.extname(file)
+
+  switch (ext) {
+    case ".js":
+      return loadJsFile(file)
+    case ".json":
+      return loadJSONFile(file)
+    default:
+      return {}
+  }
+}
+
 module.exports = (dir) => {
   if (!fs.existsSync(dir)) return {}
 
   return fs
     .readdirSync(dir, { withFileTypes: true })
-    .filter((file) => file.isFile())
+    .filter((file) => file.isFile() && isNotJunk(file.name))
     .reduce((acc, file) => {
       const key = path.basename(file.name, path.extname(file.name))
-
       acc[key] = loadFile(path.resolve(dir, file.name))
-
       return acc
     }, {})
 }

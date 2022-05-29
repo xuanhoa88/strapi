@@ -1,14 +1,6 @@
 {
   "routes": [
     {
-      "method": "GET",
-      "path": "/excels",
-      "handler": "excel.find",
-      "config": {
-        "policies": []
-      }
-    },
-    {
       "method": "POST",
       "path": "/excels/create-by-template",
       "handler": "excel.create",

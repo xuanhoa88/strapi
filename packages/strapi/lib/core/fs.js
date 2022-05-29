@@ -8,9 +8,10 @@ module.exports = (strapi) => {
   function normalizePath(optPath) {
     const filePath = Array.isArray(optPath) ? optPath.join("/") : optPath
 
-    const normalizedPath = path.normalize(filePath).replace(/^(\/?\.\.?)+/, "")
-
-    return path.join(strapi.dir, normalizedPath)
+    return path.join(
+      strapi.dir,
+      path.normalize(filePath).replace(/^(\/?\.\.?)+/, "")
+    )
   }
 
   const strapiFS = {

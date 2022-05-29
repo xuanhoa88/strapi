@@ -4,12 +4,30 @@ const fs = require("fs")
 const _ = require("lodash")
 const glob = require("../load/glob")
 const findPackagePath = require("../load/package-path")
+const { isNotJunk } = require("../utils/junk")
+
+function mountMiddleware(name, files, middlewares) {
+  files.forEach((file) => {
+    middlewares[name] = middlewares[name] || { loaded: false }
+    if (_.endsWith(file, "index.js") && !middlewares[name].load) {
+      return Object.defineProperty(middlewares[name], "load", {
+        configurable: false,
+        enumerable: true,
+        get: () => require(file)(strapi),
+      })
+    }
+
+    if (_.endsWith(file, "defaults.json")) {
+      middlewares[name].defaults = require(file)
+    }
+  })
+}
 
 /**
  * Build loader functions
  * @param {*} strapi - strapi instance
  */
-const createLoaders = (strapi) => {
+const createLoaders = () => {
   async function loadMiddlewaresInDir(dir, middlewares) {
     const files = await glob("*/*(index|defaults).*(js|json)", {
       cwd: dir,
@@ -49,7 +67,7 @@ const createLoaders = (strapi) => {
     const pluginsDir = path.resolve(appPath, "plugins")
     if (!fs.existsSync(pluginsDir)) return
 
-    const pluginsNames = fs.readdirSync(pluginsDir)
+    const pluginsNames = fs.readdirSync(pluginsDir).filter(isNotJunk)
 
     for (const pluginFolder of pluginsNames) {
       // ignore files
@@ -73,23 +91,6 @@ const createLoaders = (strapi) => {
 
       mountMiddleware(packageName, files, middlewares)
     }
-  }
-
-  function mountMiddleware(name, files, middlewares) {
-    files.forEach((file) => {
-      middlewares[name] = middlewares[name] || { loaded: false }
-      if (_.endsWith(file, "index.js") && !middlewares[name].load) {
-        return Object.defineProperty(middlewares[name], "load", {
-          configurable: false,
-          enumerable: true,
-          get: () => require(file)(strapi),
-        })
-      }
-
-      if (_.endsWith(file, "defaults.json")) {
-        middlewares[name].defaults = require(file)
-      }
-    })
   }
 
   return {

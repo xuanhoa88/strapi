@@ -1,9 +1,15 @@
-const { uniq, difference, get, merge, isFunction, isNil } = require("lodash")
+const {
+  uniq,
+  difference,
+  get,
+  merge,
+  isFunction,
+  isNil,
+  keys,
+} = require("lodash")
 
 module.exports = async (strapi) => {
-  /** Utils */
-
-  const hookConfig = strapi.config.hook
+  const { hook: hookConfig } = strapi.config
 
   // check if a hook exists
   const hookExists = (key) => !isNil(strapi.hook[key])
@@ -13,13 +19,13 @@ module.exports = async (strapi) => {
     get(hookConfig, ["settings", key, "enabled"], false) === true
 
   // list of enabled hooks
-  const enableddHook = Object.keys(strapi.hook).filter(hookEnabled)
+  const enableddHook = keys(strapi.hook).filter(hookEnabled)
 
   // Method to initialize hooks and emit an event.
   const initialize = (hookKey) => {
     if (strapi.hook[hookKey].loaded === true) return
 
-    const module = strapi.hook[hookKey].load
+    const { load } = strapi.hook[hookKey]
     const hookTimeout = get(
       hookConfig,
       ["settings", hookKey, "timeout"],
@@ -32,10 +38,26 @@ module.exports = async (strapi) => {
         hookTimeout || 1000
       )
 
-      strapi.hook[hookKey] = merge(strapi.hook[hookKey], module)
+      strapi.hook[hookKey] = merge(strapi.hook[hookKey], load)
+
+      const onFinish = (err) => {
+        if (err) {
+          strapi.app.emit(`hook:${hookKey}:error`)
+          return reject(err)
+        }
+
+        strapi.hook[hookKey].loaded = true
+
+        strapi.app.emit(`hook:${hookKey}:loaded`)
+
+        // Remove listeners.
+        strapi.app.removeAllListeners(`hook:${hookKey}:loaded`)
+
+        resolve()
+      }
 
       Promise.resolve()
-        .then(() => module.initialize())
+        .then(() => load.initialize(onFinish))
         .then(() => {
           clearTimeout(timeout)
           strapi.hook[hookKey].loaded = true

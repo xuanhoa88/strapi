@@ -1,6 +1,7 @@
 const assert = require("assert")
 const path = require("path")
 const fs = require("fs")
+const { isNotJunk } = require("../utils/junk")
 
 const loadPolicy = (file) => {
   try {
@@ -20,7 +21,7 @@ module.exports = (dir) => {
   const root = {}
   const paths = fs
     .readdirSync(dir, { withFileTypes: true })
-    .filter((fd) => fd.isFile())
+    .filter((file) => file.isFile() && isNotJunk(file.name))
 
   for (const fd of paths) {
     const { name } = fd
