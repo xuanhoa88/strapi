@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile-${NODE_ENV:-development}
+    env_file: ../.env
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+    ports:
+      - 1337:1337
+    volumes:
+      - "app-data:/var/lib/strapi"
+      - "../node_modules:/usr/src/app/node_modules"
+      - "../.:/usr/src/app"
+    restart: unless-stopped
+    tty: true
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0.29
+    container_name: mysql
+    ports:
+      - "33060:3306"
+    volumes:
+      - "mysql-data:/var/lib/mysql"
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-codegen}
+      - MYSQL_USER=${MYSQL_USER:-codegen}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-CodeGen@2002#}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-CodeGen@123#}
+    restart: always
+    networks:
+      - app-network
+    tty: true
+
+volumes:
+  app-data:
+  mysql-data:
+
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,27 @@
+FROM ubuntu:22.04
+
+ARG STRAPI_PORT
+
+# Set environment variables
+ENV APP_DIR="/usr/src/app" \
+  NPM_CONFIG_LOGLEVEL="warn" \
+  NODE_ENV="development"
+
+# Install Node.js and npm
+RUN apt-get update && apt-get upgrade -y && \
+  apt-get install -y curl
+
+RUN curl --silent --location https://deb.nodesource.com/setup_16.x | bash -
+
+RUN apt-get install -y \
+  nodejs
+
+WORKDIR ${APP_DIR}
+
+COPY . .
+
+RUN npm ci
+
+EXPOSE ${STRAPI_PORT}
+
+CMD ["npm", "run", "dev"]
