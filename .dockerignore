@@ -1,0 +1,17 @@
+.dockerignore
+.editorconfig
+.eslintignore
+.eslintrc
+.git/
+.gitignore
+.vscode
+.gitlab-ci.yml
+.travis.yml
+Dockerfile
+docker/
+docker-compose.yml
+node_modules/
+admin/node_modules/
+plugins/**/node_modules/
+docker/Dockerfile-dev
+docker/docker-compose-dev.yml

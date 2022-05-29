@@ -1,0 +1,7 @@
+# do not lint node_modules/
+node_modules
+# do not lint build/ or dist/ folder
+dist
+build
+# do not lint coverage/ folder
+coverage

@@ -1,0 +1,6 @@
+{
+  "router": {
+    "enabled": true,
+    "prefix": "/api/v1"
+  }
+}

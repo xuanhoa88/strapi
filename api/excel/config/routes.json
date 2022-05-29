@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/excels",
+      "handler": "excel.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/excels/create-by-template",
+      "handler": "excel.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/excels/download",
+      "handler": "excel.download",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

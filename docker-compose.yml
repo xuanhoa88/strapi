@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: mysql:8.0.29
+    ports:
+      - 3306:3306
+    volumes:
+      - "mysql-data:/var/lib/mysql"
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-codegen}
+      - MYSQL_USER=${MYSQL_USER:-codegen}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-CodeGen@2002#}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-CodeGen@123#}
+    restart: always
+    tty: true
+
+  redis:
+    image: redis:7.0.0
+    ports:
+      - 6379:6379/tcp
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD:-CodeGen@123#}
+    volumes:
+      - "redis-data:/data"
+    restart: always
+    tty: true
+
+  rabbitmq:
+    image: rabbitmq:3.9.18-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - "rabbitmq-data/data:/var/lib/rabbitmq"
+      - "rabbitmq-data/log:/var/log/rabbitmq"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-codegen}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-CodeGen@123#}
+      RABBITMQ_DEFAULT_VHOST: "/"
+    restart: always
+    tty: true
+
+volumes:
+  mysql-data:
+    driver: local
+  redis-data:
+    driver: local
+  rabbitmq-data:
+    driver: local
