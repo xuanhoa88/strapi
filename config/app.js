@@ -1,3 +1,3 @@
 module.exports = {
-  storage: "/opt/codegen-data",
+  storage: "/opt/storage/strapi",
 }

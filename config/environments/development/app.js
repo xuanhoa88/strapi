@@ -1,3 +1,1 @@
-module.exports = {
-  storage: "/var/lib/strapi",
-}
+module.exports = {}
