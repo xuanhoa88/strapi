@@ -7,7 +7,7 @@
     "strapi": "./bin/strapi.js"
   },
   "scripts": {
-    "strapi": "./bin/strapi.js",
+    "strapi": "node ./bin/strapi.js",
     "prod": "npm run strapi -- production",
     "dev": "npm run strapi -- develop",
     "env": "npm run strapi -- env",
