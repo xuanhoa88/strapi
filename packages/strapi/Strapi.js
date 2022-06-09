@@ -9,9 +9,7 @@ const chalk = require('chalk')
 const CLITable = require('cli-table3')
 const { getAbsoluteServerUrl } = require('@strapi/utils')
 const { createLogger } = require('@strapi/logger')
-const {
-  createDatabaseManager,
-} = require('../strapi-database/lib/database-manager')
+const { createDatabaseManager } = require('../strapi-database/database-manager')
 const register = require('./core/register')
 const loadConfiguration = require('./core/load-configuration')
 const loadModules = require('./core/load-modules')
