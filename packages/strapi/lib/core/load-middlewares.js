@@ -2,8 +2,8 @@
 const path = require('path')
 const fs = require('fs')
 const _ = require('lodash')
-const glob = require('../load/glob')
-const findPackagePath = require('../load/package-path')
+const glob = require('../utils/load/glob')
+const findPackagePath = require('../utils/load/package-path')
 const { isNotJunk } = require('../utils/junk')
 
 function mountMiddleware(name, files, middlewares) {

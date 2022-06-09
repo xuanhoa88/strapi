@@ -22,7 +22,7 @@ module.exports = (strapi) => ({
    */
   initialize() {
     const { level, exposeInContext, requests } =
-      strapi.config.middlewares.settings.logger
+      strapi.config.middleware.settings.logger
 
     const logLevels = _.keys(strapi.log.levels)
 

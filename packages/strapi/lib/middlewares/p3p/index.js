@@ -14,7 +14,7 @@ module.exports = (strapi) => ({
 
   initialize() {
     strapi.app.use(async (ctx, next) =>
-      convert(p3p(strapi.config.middlewares.settings.p3p))(ctx, next)
+      convert(p3p(strapi.config.middleware.settings.p3p))(ctx, next)
     )
   },
 })

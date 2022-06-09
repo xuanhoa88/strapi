@@ -1,9 +1,9 @@
 const path = require('path')
 const fs = require('fs')
 const _ = require('lodash')
-const findPackagePath = require('../load/package-path')
-const loadFiles = require('../load/load-files')
-const loadConfig = require('../load/load-config-files')
+const findPackagePath = require('../utils/load/package-path')
+const loadFiles = require('../utils/load/load-files')
+const loadConfig = require('../utils/load/load-config-files')
 
 const loadLocalPlugins = async ({ dir, config }) => {
   const pluginsDir = path.join(dir, 'plugins')

@@ -33,7 +33,7 @@ function generate(generator, scope, cb) {
 
   // Resolve string shorthand for generator defs
   // to `{ generator: 'originalDef' }`.
-  if (typeof generator === 'string') {
+  if (_.isString(generator)) {
     const generatorName = generator
     generator = {
       generator: generatorName,

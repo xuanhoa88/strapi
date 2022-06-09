@@ -2,8 +2,8 @@
 const path = require('path')
 const fs = require('fs')
 const _ = require('lodash')
-const glob = require('../load/glob')
-const findPackagePath = require('../load/package-path')
+const glob = require('../utils/load/glob')
+const findPackagePath = require('../utils/load/package-path')
 const { isNotJunk } = require('../utils/junk')
 
 const mountHooks = (name, files, hooks) => {
@@ -36,32 +36,32 @@ const mountHooks = (name, files, hooks) => {
   })
 }
 
-const loadHooksInDir = async (dir, hooks) => {
+const loadHooksInDir = async (dir, hook) => {
   const files = await glob('*/*(index|defaults).*(js|json)', {
     cwd: dir,
   })
   files.forEach((f) => {
     const name = f.split('/')[0]
-    mountHooks(name, [path.resolve(dir, f)], hooks)
+    mountHooks(name, [path.resolve(dir, f)], hook)
   })
 }
 
-const loadLocalHooks = (appPath, hooks) =>
-  loadHooksInDir(path.resolve(appPath, 'hooks'), hooks)
+const loadLocalHooks = (appPath, settings) =>
+  loadHooksInDir(path.resolve(appPath, 'hooks'), settings)
 
-const loadPluginsHooks = async (plugins, hooks) => {
+const loadPluginsHooks = async (plugins, settings) => {
   await Promise.all(
     _.map(plugins, (pluginName) => {
       const dir = path.resolve(
         findPackagePath(`strapi-plugin-${pluginName}`),
         'hooks'
       )
-      return loadHooksInDir(dir, hooks)
+      return loadHooksInDir(dir, settings)
     })
   )
 }
 
-const loadLocalPluginsHooks = async (appPath, hooks) => {
+const loadLocalPluginsHooks = async (appPath, settings) => {
   const pluginsDir = path.resolve(appPath, 'plugins')
   if (!fs.existsSync(pluginsDir)) return
 
@@ -73,12 +73,12 @@ const loadLocalPluginsHooks = async (appPath, hooks) => {
       if (!stat.isDirectory()) return
 
       const dir = path.resolve(pluginsDir, pluginName, 'hooks')
-      return loadHooksInDir(dir, hooks)
+      return loadHooksInDir(dir, settings)
     })
   )
 }
 
-const loadHookDependencies = async (installedHooks, hooks) => {
+const loadHookDependencies = async (installedHooks, settings) => {
   for (const hook of installedHooks) {
     const hookDir = path.dirname(require.resolve(`strapi-hook-${hook}`))
 
@@ -88,7 +88,7 @@ const loadHookDependencies = async (installedHooks, hooks) => {
       absolute: true,
     })
 
-    mountHooks(hook, files, hooks)
+    mountHooks(hook, files, settings)
   }
 }
 
@@ -99,17 +99,17 @@ module.exports = async ({
   installedHooks,
   installedPlugins,
   appPath,
-  hooks,
+  hook,
 }) => {
   await Promise.all([
-    loadHookDependencies(installedHooks, hooks),
+    loadHookDependencies(installedHooks, hook),
     // local hooks
-    loadLocalHooks(appPath, hooks),
+    loadLocalHooks(appPath, hook),
     // plugins hooks
-    loadPluginsHooks(installedPlugins, hooks),
+    loadPluginsHooks(installedPlugins, hook),
     // local plugin hooks
-    loadLocalPluginsHooks(appPath, hooks),
+    loadLocalPluginsHooks(appPath, hook),
   ])
 
-  return hooks
+  return hook
 }

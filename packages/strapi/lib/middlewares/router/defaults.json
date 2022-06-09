@@ -1,6 +1,5 @@
 {
   "router": {
-    "enabled": true,
-    "prefix": "/v1"
+    "enabled": true
   }
 }

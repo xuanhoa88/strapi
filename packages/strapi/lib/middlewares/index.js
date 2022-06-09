@@ -22,7 +22,7 @@ const requiredMiddlewares = [
 
 module.exports = async (strapi) => {
   /** Utils */
-  const middlewareConfig = strapi.config.middlewares
+  const { middleware: middlewareConfig } = strapi.config
 
   // check if a middleware exists
   const middlewareExists = (key) => !isNil(strapi.middlewares[key])

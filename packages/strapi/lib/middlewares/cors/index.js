@@ -26,7 +26,11 @@ module.exports = (strapi) => ({
       methods,
       headers,
       keepHeadersOnError,
-    } = _.assign({}, defaults, strapi.config.get('middlewares.settings.cors'))
+    } = _.assign(
+      {},
+      defaults,
+      strapi.config.get(['middleware', 'settings', 'cors'])
+    )
 
     strapi.app.use(
       cors({

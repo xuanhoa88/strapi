@@ -48,7 +48,7 @@ function targetIsUtils(target) {
  */
 
 function parseTarget(target, scope, cb) {
-  if (typeof target === 'string') {
+  if (_.isString(target)) {
     target = {
       generator: target,
     }
@@ -62,11 +62,11 @@ function parseTarget(target, scope, cb) {
   if (target.generator) {
     // Normalize the subgenerator reference.
     let subGeneratorRef
-    if (typeof target.generator === 'string') {
+    if (_.isString(target.generator)) {
       subGeneratorRef = {
         module: target.generator,
       }
-    } else if (typeof target.generator === 'object') {
+    } else if (_.isObject(target.generator)) {
       subGeneratorRef = target.generator
     }
 
@@ -92,7 +92,7 @@ function parseTarget(target, scope, cb) {
     }
 
     // Otherwise, we'll attempt to load this subgenerator.
-    if (typeof subGeneratorRef.module === 'string') {
+    if (_.isString(subGeneratorRef.module)) {
       // Lookup the generator by name if a `module` was specified
       // This allows the module for a given generator to be
       // overridden.
@@ -207,13 +207,11 @@ function parseTarget(target, scope, cb) {
  */
 
 function isValidTarget(target) {
-  let ok = typeof target === 'object'
-
   // Is using a helper.
   // Or is another generator def.
-  ok = ok && (targetIsUtils(target) || _.has(target, 'targets'))
-
-  return ok
+  return (
+    _.isObject(target) && (targetIsUtils(target) || _.has(target, 'targets'))
+  )
 }
 
 module.exports = (options, next) => {
@@ -260,7 +258,7 @@ module.exports = (options, next) => {
       if (target.copy) {
         scope = mergeSubtargetScope(
           scope,
-          typeof target.copy === 'string'
+          _.isString(target.copy)
             ? {
                 templatePath: target.copy,
               }
@@ -277,7 +275,7 @@ module.exports = (options, next) => {
       if (target.template) {
         scope = mergeSubtargetScope(
           scope,
-          typeof target.template === 'string'
+          _.isString(target.template)
             ? {
                 templatePath: target.template,
               }
@@ -288,9 +286,9 @@ module.exports = (options, next) => {
       }
 
       if (target.jsonfile) {
-        if (typeof target.jsonfile === 'object') {
+        if (_.isObject(target.jsonfile)) {
           scope = mergeSubtargetScope(scope, target.jsonfile)
-        } else if (typeof target.jsonfile === 'function') {
+        } else if (_.isFunction(target.jsonfile)) {
           scope = _.merge(scope, {
             data: target.jsonfile(scope),
           })

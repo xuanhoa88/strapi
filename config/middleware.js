@@ -1,14 +1,6 @@
 module.exports = {
   load: {
-    before: [
-      'authorization',
-      'responseTime',
-      'logger',
-      'cors',
-      'responses',
-      'gzip',
-      'passport',
-    ],
+    before: ['responseTime', 'logger', 'cors', 'responses', 'gzip', 'passport'],
     after: ['parser', 'router'],
   },
   settings: {
@@ -27,18 +19,6 @@ module.exports = {
         'Origin',
         'X-Origin',
       ],
-    },
-    passport: {
-      enabled: true,
-    },
-    authorization: {
-      enabled: true,
-    },
-    cron: {
-      enabled: true,
-    },
-    csrf: {
-      enabled: false,
     },
     language: {
       enabled: true,

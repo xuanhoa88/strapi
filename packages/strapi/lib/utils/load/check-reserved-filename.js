@@ -8,7 +8,6 @@ const prefixedPaths = [
   'hooks',
   'middlewares',
   'language',
-  'layout',
   'helpers',
 ]
 

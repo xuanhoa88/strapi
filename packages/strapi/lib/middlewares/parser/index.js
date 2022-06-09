@@ -39,7 +39,7 @@ module.exports = (strapi) => ({
         return await body({
           patchKoa: true,
           ...omit(
-            strapi.config.middlewares.settings.parser,
+            strapi.config.middleware.settings.parser,
             'queryStringParser'
           ),
         })(ctx, next)
@@ -60,7 +60,7 @@ module.exports = (strapi) => ({
 
     addQsParser(
       strapi.app,
-      strapi.config.get('middlewares.settings.parser.queryStringParser')
+      strapi.config.get('middleware.settings.parser.queryStringParser')
     )
   },
 })

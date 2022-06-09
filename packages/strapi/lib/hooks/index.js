@@ -9,7 +9,7 @@ const {
 } = require('lodash')
 
 module.exports = async (strapi) => {
-  const { hooks: hookConfig } = strapi.config
+  const { hook: hookConfig } = strapi.config
 
   // check if a hook exists
   const hookExists = (key) => !isNil(strapi.hooks[key])

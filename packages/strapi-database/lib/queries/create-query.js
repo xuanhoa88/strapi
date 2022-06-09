@@ -1,5 +1,5 @@
 const pmap = require('p-map')
-
+const _ = require('lodash')
 const { createQueryWithLifecycles, withLifecycles } = require('./helpers')
 const { createRelationsCountsQuery } = require('./relations-counts-queries')
 const {
@@ -72,7 +72,7 @@ module.exports = function createQuery(opts) {
      * Run custom database logic
      */
     custom(mapping) {
-      if (typeof mapping === 'function') {
+      if (_.isFunction(mapping)) {
         return mapping.bind(this, { model: this.model })
       }
 
@@ -80,7 +80,7 @@ module.exports = function createQuery(opts) {
         throw new Error(`Missing mapping for orm ${this.orm}`)
       }
 
-      if (typeof mapping[this.orm] !== 'function') {
+      if (!_.isFunction(mapping[this.orm])) {
         throw new Error(
           `Custom queries must be functions received ${typeof mapping[
             this.orm

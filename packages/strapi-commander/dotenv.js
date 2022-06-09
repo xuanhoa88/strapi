@@ -3,11 +3,11 @@
  */
 const crypto = require('crypto')
 const fs = require('fs')
-const set = require('lodash/set')
+const _ = require('lodash')
 
 // Logger.
 const { createLogger } = require('@strapi/logger')
-const loadConfiguration = require('../../packages/strapi/lib/core/load-configuration')
+const loadConfiguration = require('../strapi/lib/core/load-configuration')
 
 const serialize = require('./dotenv/serialize')
 
@@ -27,7 +27,7 @@ module.exports = (id, { args }) => {
   try {
     switch (args[0]) {
       case 'key:generate': {
-        set(
+        _.set(
           parsed,
           'STRAPI_KEY',
           `base64:${crypto.randomBytes(32).toString('base64')}`

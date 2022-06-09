@@ -23,12 +23,12 @@ module.exports = {
     // Use the default `controller` file as a template for
     // every generated controller.
     'plugins/:name/controllers/:filename': {
-      template: 'controller.template',
+      template: 'controller.stub',
     },
 
     // every generated controller.
     'plugins/:name/services/:filename': {
-      template: 'service.template',
+      template: 'service.stub',
     },
 
     // Generate routes.

@@ -9,7 +9,7 @@ module.exports = (strapi) => ({
    */
 
   initialize() {
-    const { options = {} } = strapi.config.middlewares.settings.gzip
+    const { options = {} } = strapi.config.middleware.settings.gzip
     strapi.app.use(compress(options))
   },
 })

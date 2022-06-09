@@ -14,7 +14,7 @@ module.exports = (strapi) => ({
   initialize() {
     strapi.app.use(async (ctx, next) => {
       const { enabled, value } = strapi.config.get(
-        'middlewares.settings.xframe',
+        'middleware.settings.xframe',
         defaults
       )
       if (enabled) {

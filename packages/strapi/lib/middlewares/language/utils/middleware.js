@@ -2,6 +2,7 @@
  * Module dependencies.
  */
 
+const _ = require('lodash')
 const debug = require('debug')('koa:i18n')
 const { I18nProvider, SET_PREFIX } = require('./provider')
 
@@ -45,7 +46,7 @@ module.exports = function ial(app, i18n) {
   return function i18nMiddleware(ctx, next) {
     ctx.i18n.whitelist.some((key) => {
       const customLocaleMethod =
-        typeof key === 'function' && ctx.i18n.setLocale(key.apply(ctx))
+        _.isFunction(key) && ctx.i18n.setLocale(key.apply(ctx))
       if (customLocaleMethod || ctx.i18n[SET_PREFIX + key]()) return true
     })
     return next()

@@ -19,17 +19,17 @@ module.exports = {
     // Use the default `controller` file as a template for
     // every generated controller.
     ':filePath/controllers/:filename': {
-      template: 'controller.template',
+      template: 'controller.stub',
     },
 
     // every generated controller.
     ':filePath/services/:filename': {
-      template: 'service.template',
+      template: 'service.stub',
     },
 
     // Copy an empty JavaScript model where every functions will be.
     ':filePath/models/:filename': {
-      template: 'model.template',
+      template: 'model.stub',
     },
 
     // Generate routes.

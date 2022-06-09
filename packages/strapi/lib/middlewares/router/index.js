@@ -20,10 +20,6 @@ module.exports = (strapi) => {
      */
 
     initialize() {
-      strapi.router.prefix(
-        strapi.config.get('middlewares.settings.router.prefix', '')
-      )
-
       // Parse each api's routes.
       _.forEach(strapi.api, (api, apiName) => {
         const router = new Router({

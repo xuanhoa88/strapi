@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs')
+const _ = require('lodash')
 const { templateConfiguration, env } = require('@strapi/utils')
 const { isNotJunk } = require('../../utils/junk')
 
@@ -8,7 +9,7 @@ const loadJsFile = (file) => {
     const jsModule = require(file)
 
     // call if function
-    if (typeof jsModule === 'function') {
+    if (_.isFunction(jsModule)) {
       return jsModule({ env })
     }
 

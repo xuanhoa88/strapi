@@ -9,7 +9,7 @@ const program = new Command()
 const getLocalScript =
   (name) =>
   (...args) => {
-    const cmdPath = resolveCwd.silent(`${__dirname}/commands/${name}`)
+    const cmdPath = resolveCwd.silent(`${__dirname}/strapi-commander/${name}`)
     if (!cmdPath) {
       console.log(
         `Error loading the local ${yellow(
@@ -19,10 +19,10 @@ const getLocalScript =
       process.exit(1)
     }
 
-    const script = require(cmdPath)
+    const done = require(cmdPath)
 
     Promise.resolve()
-      .then(() => script(...args))
+      .then(() => done(...args))
       .catch((error) => {
         console.error(
           `Error while running command ${name}: ${error.message || error}`

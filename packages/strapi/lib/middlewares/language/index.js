@@ -21,7 +21,7 @@ module.exports = (strapi) => ({
     locale(strapi.app)
 
     const { defaultLocale, modes, cookieName } =
-      strapi.config.middlewares.settings.language
+      strapi.config.middleware.settings.language
 
     const directory = resolve(
       strapi.config.appPath,
@@ -31,7 +31,7 @@ module.exports = (strapi) => ({
 
     strapi.i18n = new I18nProvider({
       directory,
-      locales: strapi.config.get('middlewares.settings.language.locales', []),
+      locales: strapi.config.get('middleware.settings.language.locales', []),
       defaultLocale,
       modes,
       cookieName,

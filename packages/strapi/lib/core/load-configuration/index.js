@@ -30,7 +30,7 @@ const defaultConfig = {
     port: process.env.STRAPI_PORT || 1337,
     cron: { enabled: false },
   },
-  middlewares: {
+  middleware: {
     timeout: 1000,
     load: {
       before: ['responseTime', 'logger', 'cors', 'responses', 'gzip'],
@@ -39,7 +39,7 @@ const defaultConfig = {
     },
     settings: {},
   },
-  hooks: {
+  hook: {
     timeout: 1000,
     load: { before: [], order: [], after: [] },
     settings: {},

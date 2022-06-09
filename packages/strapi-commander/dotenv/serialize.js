@@ -1,9 +1,11 @@
+const _ = require('lodash')
+
 module.exports = (obj) => {
   const serializedDoc = []
 
   for (const [key, entry] of Object.entries(obj)) {
-    const description = typeof entry === 'object' ? entry.description : null
-    const value = typeof entry === 'object' ? entry.value : entry
+    const description = _.isObject(entry) ? entry.description : null
+    const value = _.isObject(entry) ? entry.value : entry
 
     let serializedEntry = ''
 

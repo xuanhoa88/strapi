@@ -24,7 +24,7 @@ module.exports = {
   before: require('./before'),
   targets: {
     'helpers/:filename': {
-      template: 'helper.template',
+      template: 'helper.stub',
     },
   },
 }

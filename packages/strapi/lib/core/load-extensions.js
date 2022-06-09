@@ -2,10 +2,10 @@ const path = require('path')
 const { existsSync } = require('fs')
 const fs = require('fs')
 const _ = require('lodash')
-const loadConfig = require('../load/load-config-files')
-const loadFiles = require('../load/load-files')
-const glob = require('../load/glob')
-const filePathToPath = require('../load/filepath-to-prop-path')
+const loadConfig = require('../utils/load/load-config-files')
+const loadFiles = require('../utils/load/load-files')
+const glob = require('../utils/load/glob')
+const filePathToPath = require('../utils/load/filepath-to-prop-path')
 
 const OVERWRITABLE_FOLDERS_GLOB = 'models'
 // returns a list of path and module to overwrite

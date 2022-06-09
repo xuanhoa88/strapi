@@ -1,0 +1,8 @@
+'use strict';
+
+/**
+ * `<%= globalID %>` helper.
+ */
+
+module.exports = {
+};

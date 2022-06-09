@@ -1,8 +1,8 @@
 const { join } = require('path')
 const { existsSync } = require('fs')
 const _ = require('lodash')
-const loadFiles = require('../load/load-files')
-const loadConfig = require('../load/load-config-files')
+const loadFiles = require('../utils/load/load-files')
+const loadConfig = require('../utils/load/load-config-files')
 
 module.exports = async ({ dir }) => {
   const apiDir = join(dir, 'api')

@@ -74,14 +74,14 @@ module.exports = (strapi) => {
   })
 
   // Preset config in alphabetical order.
-  strapi.config.middlewares.settings = _.keys(strapi.middlewares).reduce(
+  strapi.config.middleware.settings = _.keys(strapi.middlewares).reduce(
     (acc, current) => {
       // Try to find the settings in the current environment, then in the main configurations.
       const currentSettings = _.merge(
         _.cloneDeep(
           _.get(strapi.middlewares[current], ['defaults', current], {})
         ),
-        strapi.config.get(['middlewares', 'settings', current], {})
+        strapi.config.get(['middleware', 'settings', current], {})
       )
 
       acc[current] = !_.isObject(currentSettings) ? {} : currentSettings
@@ -94,11 +94,11 @@ module.exports = (strapi) => {
     {}
   )
 
-  strapi.config.hooks.settings = _.keys(strapi.hooks).reduce((acc, current) => {
+  strapi.config.hook.settings = _.keys(strapi.hooks).reduce((acc, current) => {
     // Try to find the settings in the current environment, then in the main configurations.
     const currentSettings = _.merge(
       _.cloneDeep(_.get(strapi.hooks[current], ['defaults', current], {})),
-      strapi.config.get(['hooks', 'settings', current], {})
+      strapi.config.get(['hook', 'settings', current], {})
     )
 
     acc[current] = !_.isObject(currentSettings) ? {} : currentSettings

@@ -53,7 +53,7 @@ class Strapi {
     // internal services.
     this.fs = createStrapiFs(this)
 
-    this.bootstrapping()
+    this.requireProjectBootstrap()
   }
 
   handleRequest(req, res) {
@@ -64,12 +64,11 @@ class Strapi {
     return this.requestHandler(req, res)
   }
 
-  bootstrapping() {
+  requireProjectBootstrap() {
     const bootstrapPath = path.resolve(
       this.dir,
       'config/functions/bootstrap.js'
     )
-
     if (fs.existsSync(bootstrapPath)) {
       require(bootstrapPath)
     }
@@ -173,7 +172,7 @@ class Strapi {
     }
 
     await Promise.all(
-      Object.values(this.plugins).map((plugin) => {
+      _.values(this.plugins).map((plugin) => {
         if (_.has(plugin, 'destroy') && _.isFunction(plugin.destroy)) {
           return plugin.destroy()
         }
@@ -181,9 +180,7 @@ class Strapi {
       })
     )
 
-    if (_.has(this, 'db')) {
-      await this.db.destroy()
-    }
+    await this.db.destroy()
 
     delete global.strapi
   }
