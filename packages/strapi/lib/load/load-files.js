@@ -1,8 +1,8 @@
-const path = require("path")
-const _ = require("lodash")
-const fs = require("fs")
-const glob = require("./glob")
-const filePathToPath = require("./filepath-to-prop-path")
+const path = require('path')
+const _ = require('lodash')
+const fs = require('fs')
+const glob = require('./glob')
+const filePathToPath = require('./filepath-to-prop-path')
 
 /**
  * Returns an Object build from a list of files matching a glob pattern in a directory
@@ -34,13 +34,13 @@ const loadFiles = async (
       delete require.cache[absolutePath]
       let mod
 
-      if (path.extname(absolutePath) === ".json") {
+      if (path.extname(absolutePath) === '.json') {
         mod = JSON.parse(fs.readFileSync(absolutePath))
       } else {
         mod = requireFn(absolutePath)
       }
 
-      Object.defineProperty(mod, "__filename__", {
+      Object.defineProperty(mod, '__filename__', {
         enumerable: true,
         configurable: false,
         writable: false,

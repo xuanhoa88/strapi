@@ -1,6 +1,6 @@
-const { prop, assoc } = require("lodash/fp")
-const { MANY_RELATIONS } = require("@strapi/utils").relations.constants
-const { isVisibleAttribute } = require("@strapi/utils").contentTypes
+const { prop, assoc } = require('lodash/fp')
+const { MANY_RELATIONS } = require('@strapi/utils').relations.constants
+const { isVisibleAttribute } = require('@strapi/utils').contentTypes
 
 const createRelationsCountsQuery = ({ model, fn, connectorQuery }) => {
   // fetch counter map
@@ -12,25 +12,27 @@ const createRelationsCountsQuery = ({ model, fn, connectorQuery }) => {
     )
   }
 
-  return async function (params, populate) {
+  return async (params, populate) => {
     const toCount = []
     const toPopulate = []
 
     model.associations
-      .filter((assoc) => !populate || populate.includes(assoc.alias))
-      .forEach((assoc) => {
+      .filter(
+        (association) => !populate || populate.includes(association.alias)
+      )
+      .forEach((association) => {
         if (
-          MANY_RELATIONS.includes(assoc.nature) &&
-          isVisibleAttribute(model, assoc.alias)
+          MANY_RELATIONS.includes(association.nature) &&
+          isVisibleAttribute(model, association.alias)
         ) {
-          return toCount.push(assoc)
+          return toCount.push(association)
         }
 
-        toPopulate.push(assoc.alias)
+        toPopulate.push(association.alias)
       })
 
     const { results, pagination } = await fn(params, toPopulate)
-    const resultsIds = results.map(prop("id"))
+    const resultsIds = results.map(prop('id'))
 
     const counters = await Promise.all(
       toCount.map(async ({ alias }) => ({

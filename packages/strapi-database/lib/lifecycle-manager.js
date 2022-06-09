@@ -1,14 +1,14 @@
-const debug = require("debug")("strapi-database:lifecycle")
-const { isFunction, isNil } = require("lodash/fp")
+const debug = require('debug')('strapi-database:lifecycle')
+const { isFunction, isNil } = require('lodash/fp')
 
 class LifecycleManager {
   constructor() {
-    debug("Initialize lifecycle manager")
+    debug('Initialize lifecycle manager')
     this.lifecycles = []
   }
 
   register(lifecycle) {
-    debug("Register lifecycle")
+    debug('Register lifecycle')
 
     this.lifecycles.push(lifecycle)
     return this

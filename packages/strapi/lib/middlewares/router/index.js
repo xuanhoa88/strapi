@@ -3,9 +3,9 @@
  */
 
 // Public node modules.
-const _ = require("lodash")
-const Router = require("koa-router")
-const createEndpointComposer = require("./utils/composeEndpoint")
+const _ = require('lodash')
+const Router = require('koa-router')
+const createEndpointComposer = require('./utils/composeEndpoint')
 
 /**
  * Router hook
@@ -20,33 +20,43 @@ module.exports = (strapi) => {
      */
 
     initialize() {
-      _.forEach(strapi.config.routes, (value) => {
-        composeEndpoint(value, { router: strapi.router })
-      })
-
       strapi.router.prefix(
-        strapi.config.get("middleware.settings.router.prefix", "")
+        strapi.config.get('middlewares.settings.router.prefix', '')
       )
 
-      if (strapi.plugins) {
-        // Parse each plugin's routes.
-        _.forEach(strapi.plugins, (plugin, pluginName) => {
-          const router = new Router({
-            prefix: `/${pluginName}`,
-          })
-
-          ;(plugin.config.routes || []).forEach((route) => {
-            const hasPrefix = _.has(route.config, "prefix")
-            composeEndpoint(route, {
-              plugin: pluginName,
-              router: hasPrefix ? strapi.router : router,
-            })
-          })
-
-          // Mount plugin router
-          strapi.app.use(router.routes()).use(router.allowedMethods())
+      // Parse each api's routes.
+      _.forEach(strapi.api, (api, apiName) => {
+        const router = new Router({
+          prefix: `/api/${_.trim(api.config.prefix, '/') || apiName}`,
         })
-      }
+        _.forEach(api.config.routes, (route) => {
+          composeEndpoint(route, {
+            router,
+            name: apiName,
+          })
+        })
+
+        // Mount api router
+        strapi.router.use(router.routes()).use(router.allowedMethods())
+      })
+
+      // Parse each plugin's routes.
+      _.forEach(strapi.plugins, (plugin, pluginName) => {
+        const router = new Router({
+          prefix: `/plugin/${_.trim(plugin.config.prefix, '/') || pluginName}`,
+        })
+
+        _.forEach(plugin.config.routes, (route) => {
+          composeEndpoint(route, {
+            name: pluginName,
+            type: 'plugin',
+            router,
+          })
+        })
+
+        // Mount plugin router
+        strapi.router.use(router.routes()).use(router.allowedMethods())
+      })
     },
   }
 }

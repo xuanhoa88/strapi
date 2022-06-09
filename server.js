@@ -6,14 +6,14 @@
  */
 
 // Strapi.
-const strapi = require("./packages/strapi/lib/Strapi")
+const strapi = require('./packages/strapi/lib/Strapi')
 
-process.on("unhandledRejection", (reason, p) => {
-  console.log(reason, "Unhandled Rejection at Promise", p)
+process.on('unhandledRejection', (reason, p) => {
+  console.log(reason, 'Unhandled Rejection at Promise', p)
 })
 
-process.on("uncaughtException", (err) => {
-  console.log(err, "Uncaught Exception thrown")
+process.on('uncaughtException', (err) => {
+  console.log(err, 'Uncaught Exception thrown')
 })
 
 process.chdir(__dirname)

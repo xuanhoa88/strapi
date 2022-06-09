@@ -1,6 +1,6 @@
-const convert = require("koa-convert")
-const { xframe } = require("koa-lusca")
-const defaults = require("./defaults.json")
+const convert = require('koa-convert')
+const { xframe } = require('koa-lusca')
+const defaults = require('./defaults.json')
 
 /**
  * CRON hook
@@ -14,7 +14,7 @@ module.exports = (strapi) => ({
   initialize() {
     strapi.app.use(async (ctx, next) => {
       const { enabled, value } = strapi.config.get(
-        "middleware.settings.xframe",
+        'middlewares.settings.xframe',
         defaults
       )
       if (enabled) {

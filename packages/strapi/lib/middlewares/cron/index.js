@@ -3,8 +3,8 @@
  */
 
 // Public node modules.
-const _ = require("lodash")
-const cron = require("node-schedule")
+const _ = require('lodash')
+const cron = require('node-schedule')
 
 /**
  * CRON hook
@@ -16,9 +16,9 @@ module.exports = (strapi) => ({
    */
 
   initialize() {
-    if (strapi.config.get("server.cron.enabled", false) === true) {
+    if (strapi.config.get('server.cron.enabled', false) === true) {
       _.forEach(
-        _.keys(strapi.config.get("functions.cron", {})),
+        _.keys(strapi.config.get('functions.cron', {})),
         (taskExpression) => {
           const taskValue = strapi.config.functions.cron[taskExpression]
 
@@ -26,7 +26,7 @@ module.exports = (strapi) => ({
             return cron.scheduleJob(taskExpression, taskValue)
           }
 
-          const options = _.get(taskValue, "options", {})
+          const options = _.get(taskValue, 'options', {})
 
           cron.scheduleJob(
             {

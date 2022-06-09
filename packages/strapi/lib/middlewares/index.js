@@ -7,39 +7,39 @@ const {
   keys,
   includes,
   isNil,
-} = require("lodash")
+} = require('lodash')
 
 const requiredMiddlewares = [
-  "responses",
-  "router",
-  "logger",
-  "boom",
-  "cors",
-  "cron",
-  "xframe",
-  "xss",
+  'responses',
+  'router',
+  'logger',
+  'boom',
+  'cors',
+  'cron',
+  'xframe',
+  'xss',
 ]
 
 module.exports = async (strapi) => {
   /** Utils */
-  const middlewareConfig = strapi.config.middleware
+  const middlewareConfig = strapi.config.middlewares
 
   // check if a middleware exists
-  const middlewareExists = (key) => !isNil(strapi.middleware[key])
+  const middlewareExists = (key) => !isNil(strapi.middlewares[key])
 
   // check if a middleware is enabled
   const middlewareEnabled = (key) =>
     includes(requiredMiddlewares, key) ||
-    get(middlewareConfig, ["settings", key, "enabled"], false) === true
+    get(middlewareConfig, ['settings', key, 'enabled'], false) === true
 
   // list of enabled middlewares
-  const enabledMiddlewares = keys(strapi.middleware).filter(middlewareEnabled)
+  const enabledMiddlewares = keys(strapi.middlewares).filter(middlewareEnabled)
 
   // Method to initialize middlewares and emit an event.
   const initialize = (middlewareKey) => {
-    if (strapi.middleware[middlewareKey].loaded === true) return
+    if (strapi.middlewares[middlewareKey].loaded === true) return
 
-    const middleware = strapi.middleware[middlewareKey].load
+    const middleware = strapi.middlewares[middlewareKey].load
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(
@@ -48,8 +48,8 @@ module.exports = async (strapi) => {
         middlewareConfig.timeout || 1000
       )
 
-      strapi.middleware[middlewareKey] = merge(
-        strapi.middleware[middlewareKey],
+      strapi.middlewares[middlewareKey] = merge(
+        strapi.middlewares[middlewareKey],
         middleware
       )
 
@@ -57,7 +57,7 @@ module.exports = async (strapi) => {
         .then(() => middleware.initialize())
         .then(() => {
           clearTimeout(timeout)
-          strapi.middleware[middlewareKey].loaded = true
+          strapi.middlewares[middlewareKey].loaded = true
           resolve()
         })
         .catch((err) => {
@@ -77,7 +77,7 @@ module.exports = async (strapi) => {
   // Run beforeInitialize of every middleware
   await Promise.all(
     enabledMiddlewares.map((key) => {
-      const { beforeInitialize } = strapi.middleware[key].load
+      const { beforeInitialize } = strapi.middlewares[key].load
       if (isFunction(beforeInitialize)) {
         return beforeInitialize()
       }
@@ -90,15 +90,15 @@ module.exports = async (strapi) => {
     await Promise.all(uniq(middlewares).map((key) => initialize(key)))
   }
 
-  const middlewaresBefore = get(middlewareConfig, "load.before", [])
+  const middlewaresBefore = get(middlewareConfig, 'load.before', [])
     .filter(middlewareExists)
     .filter(middlewareEnabled)
 
-  const middlewaresAfter = get(middlewareConfig, "load.after", [])
+  const middlewaresAfter = get(middlewareConfig, 'load.after', [])
     .filter(middlewareExists)
     .filter(middlewareEnabled)
 
-  const middlewaresOrder = get(middlewareConfig, "load.order", [])
+  const middlewaresOrder = get(middlewareConfig, 'load.order', [])
     .filter(middlewareExists)
     .filter(middlewareEnabled)
 

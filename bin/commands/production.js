@@ -1,4 +1,4 @@
-const strapi = require("../../server")
+const strapi = require('../../server')
 
 /**
  * `$ strapi start`

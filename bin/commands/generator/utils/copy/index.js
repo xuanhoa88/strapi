@@ -3,24 +3,24 @@
  */
 
 // Node.js core.
-const path = require("path")
+const path = require('path')
 
 // Public node modules.
-const _ = require("lodash")
-const fs = require("fs")
-const reportback = require("reportback")()
+const _ = require('lodash')
+const fs = require('fs')
+const reportback = require('reportback')()
 
 // Local dependencies.
-const fileHelper = require("../file")
+const fileUtils = require('../file')
 
 /**
  * Copy file from one place to another
  */
 
-module.exports = function (options, cb) {
+module.exports = (options, cb) => {
   cb = reportback.extend(cb, {
-    alreadyExists: "error",
-    invalid: "error",
+    alreadyExists: 'error',
+    invalid: 'error',
   })
 
   // Compute the canonical path to copy from
@@ -31,12 +31,12 @@ module.exports = function (options, cb) {
     options.templatePath
   )
 
-  fs.readFile(absSrcPath, "utf8", (err, contents) => {
+  fs.readFile(absSrcPath, 'utf8', (err, contents) => {
     if (err) {
       return cb.error(err)
     }
 
-    return fileHelper(
+    return fileUtils(
       _.merge(options, {
         contents,
       }),

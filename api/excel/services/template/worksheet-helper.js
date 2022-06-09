@@ -1,6 +1,6 @@
-const _ = require("lodash")
-const { ValueType } = require("exceljs")
-const CellRange = require("./cell-range")
+const _ = require('lodash')
+const { ValueType } = require('exceljs')
+const CellRange = require('./cell-range')
 
 class WorkSheetHelper {
   constructor(worksheet) {
@@ -18,7 +18,7 @@ class WorkSheetHelper {
   addImage(fileName, cell) {
     const imgId = this.workbook.addImage({
       filename: fileName,
-      extension: "jpeg",
+      extension: 'jpeg',
     })
     const cellRange = this.getMergeRange(cell)
     if (cellRange) {
@@ -66,8 +66,8 @@ class WorkSheetHelper {
       rangeSrc.countColumns !== rangeDest.countColumns
     ) {
       console.warn(
-        "WorkSheetHelper.copyCellRange",
-        "The cell ranges must have an equal size",
+        'WorkSheetHelper.copyCellRange',
+        'The cell ranges must have an equal size',
         rangeSrc,
         rangeDest
       )
@@ -132,7 +132,7 @@ class WorkSheetHelper {
         (item) => item.indexOf(`${address}:`) !== -1
       )
       if (cellRangeStr) {
-        const [cellTlAdr, cellBrAdr] = cellRangeStr.split(":", 2)
+        const [cellTlAdr, cellBrAdr] = cellRangeStr.split(':', 2)
         return CellRange.createFromCells(
           this.worksheet.getCell(cellTlAdr),
           this.worksheet.getCell(cellBrAdr)

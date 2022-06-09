@@ -3,23 +3,23 @@
  */
 
 // Node.js core.
-const path = require("path")
+const path = require('path')
 
 // Public node modules.
-const _ = require("lodash")
-const async = require("async")
-const fs = require("fs")
-const reportback = require("reportback")()
+const _ = require('lodash')
+const async = require('async')
+const fs = require('fs')
+const reportback = require('reportback')()
 
 /**
  * Generate a file using the specified string
  */
 
 /* eslint-disable prefer-template */
-module.exports = (options, cb) => {
+module.exports = (options, next) => {
   // Provide default values for switchback.
-  cb = reportback.extend(cb, {
-    alreadyExists: "error",
+  next = reportback.extend(next, {
+    alreadyExists: 'error',
   })
 
   // Provide defaults and validate required options.
@@ -27,9 +27,9 @@ module.exports = (options, cb) => {
     force: false,
   })
 
-  const missingOpts = _.difference(["contents", "rootPath"], _.keys(options))
+  const missingOpts = _.difference(['contents', 'rootPath'], _.keys(options))
   if (missingOpts.length) {
-    return cb.invalid(missingOpts)
+    return next.invalid(missingOpts)
   }
 
   // In case we ended up here with a relative path,
@@ -39,14 +39,14 @@ module.exports = (options, cb) => {
   // Only override an existing file if `options.force` is true.
   fs.exists(rootPath, (exists) => {
     if (exists && !options.force) {
-      return cb.alreadyExists(
-        "Something else already exists at `" + rootPath + "`."
+      return next.alreadyExists(
+        'Something else already exists at `' + rootPath + '`.'
       )
     }
 
     // Don't actually write the file if this is a dry run.
     if (options.dry) {
-      return cb.success()
+      return next.success()
     }
 
     async.series(
@@ -66,7 +66,7 @@ module.exports = (options, cb) => {
           fs.writeFile(rootPath, options.contents, cb)
         },
       ],
-      cb
+      next
     )
   })
 }

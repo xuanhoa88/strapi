@@ -1,10 +1,10 @@
-const assert = require("assert")
-const _ = require("lodash")
+const assert = require('assert')
+const _ = require('lodash')
 
 module.exports = (initialConfig = {}) => {
   assert(
-    typeof initialConfig === "object" && initialConfig !== null,
-    "Initial config must be an object"
+    typeof initialConfig === 'object' && initialConfig !== null,
+    'Initial config must be an object'
   )
 
   const config = _.cloneDeep(initialConfig)

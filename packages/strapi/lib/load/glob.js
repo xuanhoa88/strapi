@@ -1,4 +1,4 @@
-const glob = require("glob")
+const glob = require('glob')
 
 /**
  * Promise based glob

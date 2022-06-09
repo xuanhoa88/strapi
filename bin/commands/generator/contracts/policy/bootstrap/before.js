@@ -3,8 +3,8 @@
  */
 
 // Public node modules.
-const _ = require("lodash")
-const { nameToSlug } = require("@strapi/utils")
+const _ = require('lodash')
+const { nameToSlug } = require('@strapi/utils')
 
 /**
  * This `before` function is run before generating targets.
@@ -18,7 +18,7 @@ const { nameToSlug } = require("@strapi/utils")
 module.exports = (scope, cb) => {
   if (!scope.rootPath || !scope.id) {
     return cb.invalid(
-      "Usage: `$ strapi generate:policy policyName --api apiName --plugin pluginName`"
+      'Usage: `$ strapi generate:policy policyName --api apiName --plugin pluginName`'
     )
   }
 
@@ -31,7 +31,7 @@ module.exports = (scope, cb) => {
   } else if (scope.args.plugin) {
     filePath = `./plugins/${scope.args.plugin}/config/policies`
   } else {
-    filePath = "./config/policies"
+    filePath = './config/policies'
   }
 
   // Take another pass to take advantage of the defaults absorbed in previous passes.

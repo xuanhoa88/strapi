@@ -6,7 +6,7 @@
 module.exports = {
   async create(ctx) {
     try {
-      ctx.body = await strapi.services.excel.createFromTemplate(
+      ctx.body = await strapi.api.excel.services.excel.createFromTemplate(
         ctx.request.body
       )
     } catch (err) {
@@ -15,14 +15,13 @@ module.exports = {
   },
   async download(ctx) {
     try {
-      const { stream, displayName } = await strapi.services.excel.downloadFile(
-        ctx.query.fileName
-      )
+      const { stream, displayName } =
+        await strapi.api.excel.services.excel.downloadFile(ctx.query.fileName)
       ctx.body = stream
 
       ctx.attachment(displayName)
     } catch (err) {
-      ctx.badRequest()
+      ctx.badRequest(err.message)
     }
   },
 }

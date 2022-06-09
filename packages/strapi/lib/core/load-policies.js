@@ -1,17 +1,17 @@
-const assert = require("assert")
-const path = require("path")
-const fs = require("fs")
-const { isNotJunk } = require("../utils/junk")
+const assert = require('assert')
+const path = require('path')
+const fs = require('fs')
+const { isNotJunk } = require('../utils/junk')
 
 const loadPolicy = (file) => {
   try {
     const policy = require(file)
 
-    assert(typeof policy === "function", "Policy must be a function.")
+    assert(typeof policy === 'function', 'Policy must be a function.')
 
     return policy
   } catch (error) {
-    throw `Could not load policy ${file}: ${error.message}`
+    throw new Error(`Could not load policy ${file}: ${error.message}`)
   }
 }
 

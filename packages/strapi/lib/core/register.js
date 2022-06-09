@@ -1,54 +1,47 @@
-const _ = require("lodash")
-const { getAbsoluteServerUrl } = require("@strapi/utils")
-const { contentTypes: contentTypesUtils } = require("../utils/content-types")
+const _ = require('lodash')
+const { getAbsoluteServerUrl } = require('@strapi/utils')
+const contentTypesUtils = require('../utils/content-types')
 
 module.exports = (strapi) => {
   // Set connections.
   strapi.connections = {}
 
-  const defaultConnection = strapi.config.get("database.defaultConnection")
+  const defaultConnection = strapi.config.get('database.defaultConnection')
 
   // Set current connections.
-  strapi.config.connections = strapi.config.get("database.connections", {})
+  strapi.config.connections = strapi.config.get('database.connections', {})
 
   strapi.contentTypes = {}
 
-  // Set models.
-  strapi.models = _.keys(strapi.api || []).reduce((acc, key) => {
-    for (const index in strapi.api[key].models) {
-      const controller = strapi.api[key].models[index]
-      controller.identity = controller.identity || _.upperFirst(index)
-      acc[index] = controller
-    }
+  _.keys(strapi.api).forEach((apiName) => {
+    const api = strapi.api[apiName]
+    Object.assign(api, {
+      controllers: api.controllers || [],
+      services: api.services || [],
+      models: api.models || [],
+    })
 
-    return acc
-  }, {})
+    _.keys(api.controllers).forEach((key) => {
+      const controller = api.controllers[key]
 
-  // Set controllers.
-  strapi.controllers = _.keys(strapi.api || []).reduce((acc, key) => {
-    for (const index in strapi.api[key].controllers) {
-      const controller = strapi.api[key].controllers[index]
-      controller.identity = controller.identity || _.upperFirst(index)
-      acc[index] = controller
-    }
+      Object.assign(controller, {
+        uid: `api::${controller.uid || key}`,
+      })
+    })
 
-    return acc
-  }, {})
+    _.keys(api.models || []).forEach((modelName) => {
+      const model = api.models[modelName]
 
-  // Set services.
-  strapi.services = _.keys(strapi.api || []).reduce((acc, key) => {
-    for (const index in strapi.api[key].services) {
-      acc[index] = strapi.api[key].services[index]
-    }
+      // mutate model
+      contentTypesUtils.createContentType(
+        model,
+        { modelName, defaultConnection },
+        { apiName }
+      )
 
-    return acc
-  }, {})
-
-  // Set routes.
-  strapi.config.routes = _.keys(strapi.api || []).reduce(
-    (acc, key) => acc.concat(_.get(strapi.api[key], "config.routes") || {}),
-    []
-  )
+      strapi.contentTypes[model.uid] = model
+    })
+  })
 
   _.keys(strapi.plugins).forEach((pluginName) => {
     const plugin = strapi.plugins[pluginName]
@@ -62,7 +55,7 @@ module.exports = (strapi) => {
       const controller = plugin.controllers[key]
 
       Object.assign(controller, {
-        identity: controller.identity || key,
+        uid: `plugin::${controller.uid || key}`,
       })
     })
 
@@ -81,14 +74,14 @@ module.exports = (strapi) => {
   })
 
   // Preset config in alphabetical order.
-  strapi.config.middleware.settings = _.keys(strapi.middleware).reduce(
+  strapi.config.middlewares.settings = _.keys(strapi.middlewares).reduce(
     (acc, current) => {
       // Try to find the settings in the current environment, then in the main configurations.
       const currentSettings = _.merge(
         _.cloneDeep(
-          _.get(strapi.middleware[current], ["defaults", current], {})
+          _.get(strapi.middlewares[current], ['defaults', current], {})
         ),
-        strapi.config.get(["middleware", "settings", current], {})
+        strapi.config.get(['middlewares', 'settings', current], {})
       )
 
       acc[current] = !_.isObject(currentSettings) ? {} : currentSettings
@@ -101,11 +94,11 @@ module.exports = (strapi) => {
     {}
   )
 
-  strapi.config.hook.settings = _.keys(strapi.hook).reduce((acc, current) => {
+  strapi.config.hooks.settings = _.keys(strapi.hooks).reduce((acc, current) => {
     // Try to find the settings in the current environment, then in the main configurations.
     const currentSettings = _.merge(
-      _.cloneDeep(_.get(strapi.hook[current], ["defaults", current], {})),
-      strapi.config.get(["hook", "settings", current], {})
+      _.cloneDeep(_.get(strapi.hooks[current], ['defaults', current], {})),
+      strapi.config.get(['hooks', 'settings', current], {})
     )
 
     acc[current] = !_.isObject(currentSettings) ? {} : currentSettings
@@ -117,8 +110,8 @@ module.exports = (strapi) => {
   }, {})
 
   // default settings
-  strapi.config.port = strapi.config.get("server.port") || strapi.config.port
-  strapi.config.host = strapi.config.get("server.host") || strapi.config.host
+  strapi.config.port = strapi.config.get('server.port') || strapi.config.port
+  strapi.config.host = strapi.config.get('server.host') || strapi.config.host
 
   const { serverUrl } = getAbsoluteServerUrl(strapi.config)
 

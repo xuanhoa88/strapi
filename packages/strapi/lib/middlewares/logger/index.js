@@ -1,5 +1,5 @@
-const chalk = require("chalk")
-const _ = require("lodash")
+const chalk = require('chalk')
+const _ = require('lodash')
 
 const codeToColor = (code) =>
   code >= 500
@@ -22,7 +22,7 @@ module.exports = (strapi) => ({
    */
   initialize() {
     const { level, exposeInContext, requests } =
-      strapi.config.middleware.settings.logger
+      strapi.config.middlewares.settings.logger
 
     const logLevels = _.keys(strapi.log.levels)
 

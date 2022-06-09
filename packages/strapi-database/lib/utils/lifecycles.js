@@ -1,4 +1,4 @@
-const _ = require("lodash")
+const _ = require('lodash')
 
 const executeLifecycle = async (lifecycle, model, ...args) => {
   // Run registered lifecycles

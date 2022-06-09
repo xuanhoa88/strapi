@@ -1,4 +1,4 @@
-const _ = require("lodash")
+const _ = require('lodash')
 
 const createErrorMessage = (
   modelA,
@@ -14,7 +14,7 @@ const checkDuplicatedTableNames = ({ strapi }) => {
   _.forIn(strapi.api, (api, apiName) => {
     _.forIn(api.models, (model, modelName) => {
       modelsWithInfo.push({
-        origin: "API",
+        origin: 'API',
         model,
         apiOrPluginName: apiName,
         modelName,
@@ -25,7 +25,7 @@ const checkDuplicatedTableNames = ({ strapi }) => {
   _.forIn(strapi.plugins, (plugin, pluginName) => {
     _.forIn(plugin.models, (model, modelName) => {
       modelsWithInfo.push({
-        origin: "Plugin",
+        origin: 'Plugin',
         model,
         apiOrPluginName: pluginName,
         modelName,

@@ -2,43 +2,33 @@
  * Read the documentation (https://strapi.io/documentation/developer-docs/latest/development/backend-customization.html#core-services)
  * to customize this service
  */
-const fs = require("fs")
-const path = require("path")
-const yup = require("yup")
-const uuid = require("uuid")
+const fs = require('fs')
+const path = require('path')
+const Joi = require('joi')
+const uuid = require('uuid')
 
-const { xlsxBuildByTemplate } = require("./template/utils")
+const { xlsxBuildByTemplate } = require('./template/utils')
 
 module.exports = {
-  async createFromTemplate({ fileName: templateFileName, values }) {
+  async createFromTemplate({ fileName: templateFileName, payload }) {
     try {
-      const schema = yup.object().shape({
-        fileName: yup.string().required(),
-        values: yup.object().required(),
-      })
-
-      await schema.validate(
-        {
-          fileName: templateFileName,
-          values,
-        },
-        { abortEarly: false }
-      )
-
-      if (!fs.existsSync(templateFileName)) {
+      if (templateFileName && !fs.existsSync(templateFileName)) {
         templateFileName = path.join(
           strapi.config.app.storage,
-          "templates",
-          "xlsx",
+          'templates',
+          'xlsx',
           templateFileName
         )
       }
 
-      const buffer = await xlsxBuildByTemplate(values, templateFileName)
+      const buffer = await xlsxBuildByTemplate({
+        payload,
+        path: templateFileName,
+      })
       const outputFile = path.join(uuid.v4(), path.basename(templateFileName))
       const downloadFilePath = path.join(
         strapi.config.app.storage,
-        "download",
+        'download',
         outputFile
       )
 
@@ -58,11 +48,11 @@ module.exports = {
             }),
           {}
         )
-        console.log("form error:", allErrors)
+        console.log('form error:', allErrors)
         throw allErrors
       }
 
-      console.log("xlsxHelper error:", err)
+      console.log('xlsxHelper error:', err)
       strapi.log.error(err)
     }
 
@@ -71,11 +61,10 @@ module.exports = {
 
   async downloadFile(fileName) {
     try {
-      const schema = yup.object().shape({
-        fileName: yup.string().required(),
+      const schema = Joi.object({
+        fileName: Joi.string().required(),
       })
-
-      await schema.validate(
+      await schema.validateAsync(
         {
           fileName,
         },
@@ -84,11 +73,11 @@ module.exports = {
 
       const downloadFilePath = path.join(
         strapi.config.app.storage,
-        "download",
+        'download',
         fileName
       )
       if (!fs.existsSync(downloadFilePath)) {
-        throw new Error("File have been deleted.")
+        throw new Error('File have been deleted.')
       }
 
       return {
@@ -104,13 +93,12 @@ module.exports = {
             }),
           {}
         )
-        console.log("form error:", allErrors)
+        console.log('form error:', allErrors)
         throw allErrors
       }
 
       strapi.log.error(err)
+      throw err
     }
-
-    return null
   },
 }

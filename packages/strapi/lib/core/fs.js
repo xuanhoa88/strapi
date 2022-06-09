@@ -1,16 +1,16 @@
-const path = require("path")
-const fs = require("fs")
+const path = require('path')
+const fs = require('fs')
 
 /**
  * create strapi fs layer
  */
 module.exports = (strapi) => {
   function normalizePath(optPath) {
-    const filePath = Array.isArray(optPath) ? optPath.join("/") : optPath
+    const filePath = Array.isArray(optPath) ? optPath.join('/') : optPath
 
     return path.join(
       strapi.dir,
-      path.normalize(filePath).replace(/^(\/?\.\.?)+/, "")
+      path.normalize(filePath).replace(/^(\/?\.\.?)+/, '')
     )
   }
 
@@ -32,7 +32,7 @@ module.exports = (strapi) => {
      * @param {string} data - content
      */
     writePluginFile(plugin, optPath, data) {
-      const newPath = ["extensions", plugin].concat(optPath).join("/")
+      const newPath = ['extensions', plugin].concat(optPath).join('/')
       return strapiFS.writeAppFile(newPath, data)
     },
 

@@ -1,4 +1,4 @@
-const createQuery = require("./create-query")
+const createQuery = require('./create-query')
 
 module.exports = {
   createQuery,

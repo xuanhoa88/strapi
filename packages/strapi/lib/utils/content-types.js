@@ -1,15 +1,15 @@
-const _ = require("lodash")
-const pluralize = require("pluralize")
+const _ = require('lodash')
+const pluralize = require('pluralize')
 
-const SINGLE_TYPE = "singleType"
-const COLLECTION_TYPE = "collectionType"
+const SINGLE_TYPE = 'singleType'
+const COLLECTION_TYPE = 'collectionType'
 
-const ID_ATTRIBUTE = "id"
-const PUBLISHED_AT_ATTRIBUTE = "published_at"
-const CREATED_BY_ATTRIBUTE = "created_by"
-const UPDATED_BY_ATTRIBUTE = "updated_by"
-const DP_PUB_STATE_LIVE = "live"
-const DP_PUB_STATE_PREVIEW = "preview"
+const ID_ATTRIBUTE = 'id'
+const PUBLISHED_AT_ATTRIBUTE = 'published_at'
+const CREATED_BY_ATTRIBUTE = 'created_by'
+const UPDATED_BY_ATTRIBUTE = 'updated_by'
+const DP_PUB_STATE_LIVE = 'live'
+const DP_PUB_STATE_PREVIEW = 'preview'
 const DP_PUB_STATES = [DP_PUB_STATE_LIVE, DP_PUB_STATE_PREVIEW]
 
 const constants = {
@@ -31,7 +31,7 @@ const getGlobalId = (model, modelName, prefix) => {
 }
 
 const getTimestamps = (model) => {
-  const timestamps = _.get(model, "options.timestamps", [])
+  const timestamps = _.get(model, 'options.timestamps', [])
 
   if (!_.isArray(timestamps)) {
     return []
@@ -46,7 +46,7 @@ const getTimestampsAttributes = (model) => {
   return timestamps.reduce(
     (attributes, attributeName) => ({
       ...attributes,
-      [attributeName]: { type: "timestamp" },
+      [attributeName]: { type: 'timestamp' },
     }),
     {}
   )
@@ -69,7 +69,7 @@ const getNonWritableAttributes = (model = {}) => {
 }
 
 const getWritableAttributes = (model = {}) =>
-  _.difference(Object.keys(model.attributes), getNonWritableAttributes(model))
+  _.difference(_.keys(model.attributes), getNonWritableAttributes(model))
 
 const isWritableAttribute = (model, attributeName) =>
   getWritableAttributes(model).includes(attributeName)
@@ -97,7 +97,7 @@ const isVisibleAttribute = (model, attributeName) =>
   getVisibleAttributes(model).includes(attributeName)
 
 const hasDraftAndPublish = (model) =>
-  _.get(model, "options.draftAndPublish", false) === true
+  _.get(model, 'options.draftAndPublish', false) === true
 
 const isDraft = (data, model) =>
   hasDraftAndPublish(model) && _.get(data, PUBLISHED_AT_ATTRIBUTE) === null
@@ -109,36 +109,35 @@ const isKind = (kind) => (model) => model.kind === kind
 
 const getPrivateAttributes = (model = {}) =>
   _.union(
-    strapi.config.get("api.responses.privateAttributes", []),
-    _.get(model, "options.privateAttributes", []),
+    strapi.config.get('api.responses.privateAttributes', []),
+    _.get(model, 'options.privateAttributes', []),
     _.keys(_.pickBy(model.attributes, (attr) => !!attr.private))
   )
 
-const isPrivateAttribute = (model = {}, attributeName) =>
-  model &&
-  model.privateAttributes &&
+const isPrivateAttribute = (model, attributeName) =>
+  _.get(model, 'privateAttributes') &&
   model.privateAttributes.includes(attributeName)
 
 const isScalarAttribute = (attribute) =>
   !attribute.collection &&
   !attribute.model &&
-  attribute.type !== "component" &&
-  attribute.type !== "dynamiczone"
+  attribute.type !== 'component' &&
+  attribute.type !== 'dynamiczone'
 
 const isMediaAttribute = (attr) =>
-  (attr.collection || attr.model) === "file" && attr.plugin === "upload"
+  (attr.collection || attr.model) === 'file' && attr.plugin === 'upload'
 
-const getKind = (obj) => obj.kind || "collectionType"
+const getKind = (obj) => obj.kind || 'collectionType'
 
 const pickSchema = (model) => {
   const schema = _.cloneDeep(
     _.pick(model, [
-      "connection",
-      "collectionName",
-      "info",
-      "options",
-      "pluginOptions",
-      "attributes",
+      'connection',
+      'collectionName',
+      'info',
+      'options',
+      'pluginOptions',
+      'attributes',
     ])
   )
 
@@ -153,7 +152,7 @@ const createContentType = (
 ) => {
   if (apiName) {
     Object.assign(model, {
-      uid: `application::${apiName}.${modelName}`,
+      uid: `api::${apiName}.${modelName}`,
       apiName,
       collectionName: model.collectionName || modelName.toLocaleLowerCase(),
       globalId: getGlobalId(model, modelName),
@@ -166,22 +165,16 @@ const createContentType = (
         model.collectionName || `${pluginName}_${modelName}`.toLowerCase(),
       globalId: getGlobalId(model, modelName, pluginName),
     })
-  } else {
-    Object.assign(model, {
-      uid: `strapi::${modelName}`,
-      plugin: "admin",
-      globalId: getGlobalId(model, modelName, "admin"),
-    })
   }
 
   Object.assign(model, {
     __schema__: pickSchema(model),
     kind: getKind(model),
-    modelType: "contentType",
+    modelType: 'contentType',
     modelName,
     connection: model.connection || defaultConnection,
   })
-  Object.defineProperty(model, "privateAttributes", {
+  Object.defineProperty(model, 'privateAttributes', {
     get() {
       return strapi.getModel(model.uid).privateAttributes
     },
@@ -189,7 +182,7 @@ const createContentType = (
 }
 
 const isRelationalAttribute = (attribute) =>
-  _.has(attribute, "model") || _.has(attribute, "collection")
+  _.has(attribute, 'model') || _.has(attribute, 'collection')
 
 /**
  * Checks if an attribute is of type `type`
@@ -197,7 +190,7 @@ const isRelationalAttribute = (attribute) =>
  * @param {string} type
  */
 const isTypedAttribute = (attribute, type) =>
-  _.has(attribute, "type") && attribute.type === type
+  _.has(attribute, 'type') && attribute.type === type
 
 /**
  *  Returns a route prefix for a contentType

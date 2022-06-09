@@ -3,11 +3,11 @@ class TemplateExpression {
     this.rawExpression = rawExpression
     this.pipes = []
     // this.rawExpression = rawExpression;
-    const expressionParts = expression.split("|").map((e) => e.trim())
+    const expressionParts = expression.split('|').map((e) => e.trim())
     this.valueName = expressionParts[0]
     const pipes = expressionParts.slice(1)
     pipes.forEach((pipe) => {
-      const pipeParts = pipe.split(":").map((p) => p.trim())
+      const pipeParts = pipe.split(':').map((p) => p.trim())
       this.pipes.push({
         pipeName: pipeParts[0],
         pipeParameters: pipeParts.slice(1),

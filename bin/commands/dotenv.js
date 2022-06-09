@@ -1,15 +1,15 @@
 /**
  * Module dependencies
  */
-const crypto = require("crypto")
-const fs = require("fs")
-const set = require("lodash/set")
+const crypto = require('crypto')
+const fs = require('fs')
+const set = require('lodash/set')
 
 // Logger.
-const { createLogger } = require("@strapi/logger")
-const loadConfiguration = require("../../packages/strapi/lib/core/load-configuration")
+const { createLogger } = require('@strapi/logger')
+const loadConfiguration = require('../../packages/strapi/lib/core/load-configuration')
 
-const serialize = require("./dotenv/serialize")
+const serialize = require('./dotenv/serialize')
 
 /**
  * `$ strapi generate`
@@ -26,19 +26,19 @@ module.exports = (id, { args }) => {
   const logger = createLogger(loggerConfig, {})
   try {
     switch (args[0]) {
-      case "key:generate": {
+      case 'key:generate': {
         set(
           parsed,
-          "STRAPI_KEY",
-          `base64:${crypto.randomBytes(32).toString("base64")}`
+          'STRAPI_KEY',
+          `base64:${crypto.randomBytes(32).toString('base64')}`
         )
-        logger.info("Application key set successfully.")
+        logger.info('Application key set successfully.')
         break
       }
       default:
     }
     fs.writeFileSync(dotenvPath, serialize(parsed), {
-      encoding: "utf8",
+      encoding: 'utf8',
     })
   } catch (e) {
     logger.error(e)

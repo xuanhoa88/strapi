@@ -1,8 +1,8 @@
-const { replaceIdByPrimaryKey } = require("../utils/primary-key")
+const { replaceIdByPrimaryKey } = require('../utils/primary-key')
 const {
   executeBeforeLifecycle,
   executeAfterLifecycle,
-} = require("../utils/lifecycles")
+} = require('../utils/lifecycles')
 
 const withLifecycles =
   ({ query, model, fn }) =>

@@ -3,16 +3,16 @@
  */
 
 // Public node modules.
-const reportback = require("reportback")()
-const _ = require("lodash")
+const reportback = require('reportback')()
+const _ = require('lodash')
 
 // Logger.
-const { createLogger } = require("@strapi/logger")
-const loadConfiguration = require("../../../packages/strapi/lib/core/load-configuration")
+const { createLogger } = require('@strapi/logger')
+const loadConfiguration = require('../../../packages/strapi/lib/core/load-configuration')
 
 // Local dependencies.
-const generate = require("./generate")
-const generateTarget = require("./target")
+const generate = require('./generate')
+const generateTarget = require('./target')
 
 /* eslint-disable prefer-template */
 /**
@@ -37,32 +37,31 @@ module.exports = (scope, cb) => {
   })
 
   // Use configured module name for this `generatorType` if applicable.
-  const module = scope.generatorType
+  const { generatorType } = scope
   let generator
 
   function throwIfModuleNotFoundError(error, m) {
     const isModuleNotFoundError =
       error &&
-      error.code === "MODULE_NOT_FOUND" &&
+      error.code === 'MODULE_NOT_FOUND' &&
       error.message.match(new RegExp(m))
     if (!isModuleNotFoundError) {
-      logger.error("Invalid `" + scope.generatorType + "` generator.")
+      logger.error('Invalid `' + generatorType + '` generator.')
       throw error
-    } else {
-      return error
     }
+    return error
   }
 
   // Try to require the module or throw if error.
   try {
-    generator = require("./contracts/" + module + "/bootstrap")
+    generator = require('./contracts/' + generatorType + '/bootstrap')
   } catch (error) {
-    throwIfModuleNotFoundError(error, module)
+    throwIfModuleNotFoundError(error, generatorType)
   }
 
   if (!generator) {
     return logger.error(
-      "No generator called `" + scope.generatorType + "` found."
+      'No generator called `' + scope.generatorType + '` found.'
     )
   }
 

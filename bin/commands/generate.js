@@ -2,12 +2,14 @@
  * Module dependencies
  */
 
+const _ = require('lodash')
+
 // Logger.
-const { createLogger } = require("@strapi/logger")
-const loadConfiguration = require("../../packages/strapi/lib/core/load-configuration")
+const { createLogger } = require('@strapi/logger')
+const loadConfiguration = require('../../packages/strapi/lib/core/load-configuration')
 
 // Master of ceremonies for generators.
-const generator = require("./generator")
+const generator = require('./generator')
 
 /**
  * `$ strapi generate`
@@ -27,11 +29,11 @@ module.exports = (id, cliArguments) => {
     args: cliArguments,
   }
 
-  scope.generatorType = process.argv[2].split(":")[1]
+  _.set(scope, 'generatorType', process.argv[2].split(':')[1])
 
   // Show usage if no generator type is defined.
   if (!scope.generatorType) {
-    return logger.error("Write `$ strapi generate:something` instead.")
+    return logger.error('Write `$ strapi generate:something` instead.')
   }
 
   return generator(scope, {
@@ -49,7 +51,7 @@ module.exports = (id, cliArguments) => {
         scope.outputPath = scope.destDir + scope.filename
       }
 
-      if (scope.generatorType !== "new") {
+      if (scope.generatorType !== 'new') {
         logger.info(
           `Generated a new ${scope.generatorType} \`${scope.name}\` at \`${scope.filePath}\`.`
         )

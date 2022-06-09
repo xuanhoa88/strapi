@@ -3,77 +3,48 @@
  */
 
 // Node.js core.
-const fs = require("fs")
+const fs = require('fs')
 
 // Public node modules.
-const _ = require("lodash")
+const _ = require('lodash')
 
-function generateSingleTypeRoutes({ route, name }) {
+function generateRoutes(name) {
   return [
     {
-      method: "GET",
-      path: `/${route}`,
+      method: 'GET',
+      path: '/',
       handler: `${name}.find`,
       config: {
         policies: [],
       },
     },
     {
-      method: "PUT",
-      path: `/${route}`,
-      handler: `${name}.update`,
-      config: {
-        policies: [],
-      },
-    },
-    {
-      method: "DELETE",
-      path: `/${route}`,
-      handler: `${name}.delete`,
-      config: {
-        policies: [],
-      },
-    },
-  ]
-}
-
-function generateCollectionTypeRoutes({ route, name }) {
-  return [
-    {
-      method: "GET",
-      path: `/${route}`,
-      handler: `${name}.find`,
-      config: {
-        policies: [],
-      },
-    },
-    {
-      method: "GET",
-      path: `/${route}/:id`,
+      method: 'GET',
+      path: '/:id',
       handler: `${name}.findOne`,
       config: {
         policies: [],
       },
     },
     {
-      method: "POST",
-      path: `/${route}`,
+      method: 'POST',
+      path: '/',
       handler: `${name}.create`,
       config: {
         policies: [],
       },
     },
     {
-      method: "PUT",
-      path: `/${route}/:id`,
+      method: 'PUT',
+      path: '/:id',
       handler: `${name}.update`,
       config: {
         policies: [],
       },
     },
     {
-      method: "DELETE",
-      path: `/${route}/:id`,
+      method: 'DELETE',
+      path: '/:id',
       handler: `${name}.delete`,
       config: {
         policies: [],
@@ -89,10 +60,7 @@ function generateCollectionTypeRoutes({ route, name }) {
 module.exports = (scope) => {
   let routes = []
   if (!scope.args.plugin) {
-    routes =
-      scope.contentTypeKind === "singleType"
-        ? generateSingleTypeRoutes({ route: scope.route, name: scope.name })
-        : generateCollectionTypeRoutes({ route: scope.route, name: scope.name })
+    routes = generateRoutes(scope.name)
   }
 
   // if routes.json already exists, then merge
@@ -105,5 +73,5 @@ module.exports = (scope) => {
     )
   }
 
-  return { routes }
+  return { prefix: `/${scope.route}`, routes }
 }

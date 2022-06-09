@@ -20,15 +20,15 @@
 /* eslint-disable prefer-template */
 /* eslint-disable no-useless-escape */
 const pathRegexp = (path, keys, sensitive, strict) => {
-  if (toString.call(path) === "[object RegExp]") {
+  if (toString.call(path) === '[object RegExp]') {
     return path
   }
   if (Array.isArray(path)) {
-    path = "(" + path.join("|") + ")"
+    path = '(' + path.join('|') + ')'
   }
   path = path
-    .concat(strict ? "" : "/?")
-    .replace(/\/\(/g, "(?:/")
+    .concat(strict ? '' : '/?')
+    .replace(/\/\(/g, '(?:/')
     .replace(
       /(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?(\*)?/g,
       (_, slash, format, key, capture, optional, star) => {
@@ -36,23 +36,23 @@ const pathRegexp = (path, keys, sensitive, strict) => {
           name: key,
           optional: !!optional,
         })
-        slash = slash || ""
+        slash = slash || ''
         return (
-          "" +
-          (optional ? "" : slash) +
-          "(?:" +
-          (optional ? slash : "") +
-          (format || "") +
-          (capture || (format && "([^/.]+?)") || "([^/]+?)") +
-          ")" +
-          (optional || "") +
-          (star ? "(/*)?" : "")
+          '' +
+          (optional ? '' : slash) +
+          '(?:' +
+          (optional ? slash : '') +
+          (format || '') +
+          (capture || (format && '([^/.]+?)') || '([^/]+?)') +
+          ')' +
+          (optional || '') +
+          (star ? '(/*)?' : '')
         )
       }
     )
-    .replace(/([\/.])/g, "\\$1")
-    .replace(/\*/g, "(.*)")
-  return new RegExp("^" + path + "$", sensitive ? "" : "i")
+    .replace(/([\/.])/g, '\\$1')
+    .replace(/\*/g, '(.*)')
+  return new RegExp('^' + path + '$', sensitive ? '' : 'i')
 }
 
 module.exports = {

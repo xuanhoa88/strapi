@@ -1,45 +1,45 @@
-const os = require("os")
-const path = require("path")
-const _ = require("lodash")
-const dotenv = require("dotenv")
+const os = require('os')
+const path = require('path')
+const _ = require('lodash')
+const dotenv = require('dotenv')
 
-const dotenvPath = path.resolve(process.cwd(), ".env")
+const dotenvPath = path.resolve(process.cwd(), '.env')
 const { parsed: dotenvParsed } = dotenv.config({ path: dotenvPath })
 
-process.env.NODE_ENV = process.env.NODE_ENV || "development"
+process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
-const getPrefixedDeps = require("../../utils/get-prefixed-dependencies")
-const loadPolicies = require("../load-policies")
-const loadFunctions = require("../load-functions")
-const loadConfigDir = require("./config-loader")
-const createConfigProvider = require("./config-provider")
+const getPrefixedDeps = require('../../utils/get-prefixed-dependencies')
+const loadPolicies = require('../load-policies')
+const loadFunctions = require('../load-functions')
+const loadConfigDir = require('./config-loader')
+const createConfigProvider = require('./config-provider')
 
 const CONFIG_PATHS = {
-  api: "api",
-  config: "config",
-  controllers: "controllers",
-  models: "models",
-  plugins: "plugins",
-  policies: "policies",
-  services: "services",
+  api: 'api',
+  config: 'config',
+  controllers: 'controllers',
+  models: 'models',
+  plugins: 'plugins',
+  policies: 'policies',
+  services: 'services',
 }
 
 const defaultConfig = {
   server: {
-    host: process.env.STRAPI_HOST || os.hostname() || "0.0.0.0",
+    host: process.env.STRAPI_HOST || os.hostname() || '0.0.0.0',
     port: process.env.STRAPI_PORT || 1337,
     cron: { enabled: false },
   },
-  middleware: {
+  middlewares: {
     timeout: 1000,
     load: {
-      before: ["responseTime", "logger", "cors", "responses", "gzip"],
+      before: ['responseTime', 'logger', 'cors', 'responses', 'gzip'],
       order: [],
-      after: ["parser", "router"],
+      after: ['parser', 'router'],
     },
     settings: {},
   },
-  hook: {
+  hooks: {
     timeout: 1000,
     load: { before: [], order: [], after: [] },
     settings: {},
@@ -52,9 +52,9 @@ const defaultConfig = {
 module.exports = (appPath, initialConfig = {}) => {
   const { autoReload = false } = initialConfig
 
-  const pkgJSON = require(path.resolve(appPath, "package.json"))
+  const pkgJSON = require(path.resolve(appPath, 'package.json'))
 
-  const configDir = path.resolve(appPath || process.cwd(), "config")
+  const configDir = path.resolve(appPath || process.cwd(), 'config')
 
   const rootConfig = {
     appPath,
@@ -62,20 +62,20 @@ module.exports = (appPath, initialConfig = {}) => {
     paths: CONFIG_PATHS,
     autoReload,
     environment: process.env.NODE_ENV,
-    installedPlugins: getPrefixedDeps("strapi-plugin", pkgJSON),
-    installedMiddlewares: getPrefixedDeps("strapi-middleware", pkgJSON),
-    installedHooks: getPrefixedDeps("strapi-hook", pkgJSON),
-    installedProviders: getPrefixedDeps("strapi-provider", pkgJSON),
+    installedPlugins: getPrefixedDeps('strapi-plugin', pkgJSON),
+    installedMiddlewares: getPrefixedDeps('strapi-middleware', pkgJSON),
+    installedHooks: getPrefixedDeps('strapi-hooks', pkgJSON),
+    installedProviders: getPrefixedDeps('strapi-provider', pkgJSON),
   }
 
   const baseConfig = {
     ...loadConfigDir(configDir),
-    policies: loadPolicies(path.resolve(configDir, "policies")),
-    functions: loadFunctions(path.resolve(configDir, "functions")),
+    policies: loadPolicies(path.resolve(configDir, 'policies')),
+    functions: loadFunctions(path.resolve(configDir, 'functions')),
   }
 
   const envConfig = loadConfigDir(
-    path.resolve(configDir, "environments", process.env.NODE_ENV)
+    path.resolve(configDir, 'environments', process.env.NODE_ENV)
   )
   return createConfigProvider(
     _.merge(rootConfig, defaultConfig, baseConfig, envConfig, {

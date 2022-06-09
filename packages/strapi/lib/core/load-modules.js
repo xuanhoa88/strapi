@@ -8,22 +8,25 @@
  * - ContentTypes
  */
 
-const _ = require("lodash")
+const _ = require('lodash')
 
-const loadApis = require("./load-apis")
-const loadPlugins = require("./load-plugins")
-const loadMiddlewares = require("./load-middlewares")
-const loadExtensions = require("./load-extensions")
-const loadHooks = require("./load-hooks")
+const loadApis = require('./load-apis')
+const loadPlugins = require('./load-plugins')
+const loadMiddlewares = require('./load-middlewares')
+const loadExtensions = require('./load-extensions')
+const loadHooks = require('./load-hooks')
+const loadHelpers = require('./load-helpers')
 
 module.exports = async (strapi) => {
-  const [api, plugins, middlewares, hook, extensions] = await Promise.all([
-    loadApis(strapi),
-    loadPlugins(strapi),
-    loadMiddlewares(strapi),
-    loadHooks(strapi.config),
-    loadExtensions(strapi.config),
-  ])
+  const [api, plugins, middlewares, hooks, extensions, helpers] =
+    await Promise.all([
+      loadApis(strapi),
+      loadPlugins(strapi),
+      loadMiddlewares(strapi),
+      loadHooks(strapi.config),
+      loadExtensions(strapi.config),
+      loadHelpers(strapi),
+    ])
 
   // TODO: move this into the appropriate loaders
 
@@ -33,7 +36,7 @@ module.exports = async (strapi) => {
   // merge extensions config folders
   _.mergeWith(plugins, extensions.merges, (objValue, srcValue, key) => {
     // concat routes
-    if (_.isArray(srcValue) && _.isArray(objValue) && key === "routes") {
+    if (_.isArray(srcValue) && _.isArray(objValue) && key === 'routes') {
       return srcValue.concat(objValue)
     }
   })
@@ -47,7 +50,8 @@ module.exports = async (strapi) => {
     api,
     plugins,
     middlewares,
-    hook,
+    hooks,
     extensions,
+    helpers,
   }
 }

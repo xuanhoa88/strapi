@@ -1,4 +1,4 @@
-const socketIO = require("socket.io")
+const socketIO = require('socket.io')
 
 module.exports = (strapi) => {
   const hook = {
@@ -17,17 +17,17 @@ module.exports = (strapi) => {
     initialize: (cb) => {
       process.nextTick(() => {
         const io = socketIO(strapi.server, {
-          path: "/ws",
+          path: '/ws',
           cors: {
             origin: true,
           },
         })
 
-        io.on("connection", (socket) => {
-          socket.on("logged", (user) => {
+        io.on('connection', (socket) => {
+          socket.on('logged', (user) => {
             socket.join(user)
           })
-          socket.on("logout", (user) => {
+          socket.on('logout', (user) => {
             socket.leave(user)
           })
         })

@@ -3,17 +3,17 @@
  */
 
 // Node.js core.
-const path = require("path")
-const util = require("util")
+const path = require('path')
+const util = require('util')
 
 // Public node modules.
-const _ = require("lodash")
-const async = require("async")
-const reportback = require("reportback")()
+const _ = require('lodash')
+const async = require('async')
+const reportback = require('reportback')()
 
 // Local dependencies.
-const { pathRegexp } = require("./util")
-const generateTarget = require("./target")
+const { pathRegexp } = require('./util')
+const generateTarget = require('./target')
 
 /**
  * Run a generator given an existing scope
@@ -28,12 +28,12 @@ function generate(generator, scope, cb) {
   const sb = reportback.extend(cb, {
     error: cb.error,
     invalid: cb.invalid,
-    alreadyExists: "error",
+    alreadyExists: 'error',
   })
 
   // Resolve string shorthand for generator defs
   // to `{ generator: 'originalDef' }`.
-  if (typeof generator === "string") {
+  if (typeof generator === 'string') {
     const generatorName = generator
     generator = {
       generator: generatorName,
@@ -66,14 +66,14 @@ function generate(generator, scope, cb) {
                     keyPath +
                     '": ' +
                     util.inspect(target) +
-                    "}"
+                    '}'
                 )
               )
             }
 
             // Input tolerance.
-            if (keyPath === "") {
-              keyPath = "."
+            if (keyPath === '') {
+              keyPath = '.'
             }
 
             // Interpret `keyPath` using Express's parameterized route conventions,
@@ -89,17 +89,17 @@ function generate(generator, scope, cb) {
                 }
 
                 try {
-                  const paramMatchExpr = ":" + param.name
+                  const paramMatchExpr = ':' + param.name
                   let actualParamValue = scope[param.name]
                   if (!actualParamValue) {
                     err = new Error(
-                      "generator error:\n" +
-                        "A scope variable (`" +
+                      'generator error:\n' +
+                        'A scope variable (`' +
                         param.name +
-                        "`) was referenced in target: `" +
+                        '`) was referenced in target: `' +
                         memoKeyPath +
-                        "`,\n" +
-                        "but `" +
+                        '`,\n' +
+                        'but `' +
                         param.name +
                         "` does not exist in the generator's scope."
                     )
@@ -110,7 +110,7 @@ function generate(generator, scope, cb) {
                   return memoKeyPath.replace(paramMatchExpr, actualParamValue)
                 } catch (e) {
                   err = new Error(
-                    "Error: Could not parse target key " + memoKeyPath
+                    'Error: Could not parse target key ' + memoKeyPath
                   )
                   err.message = e
                   return false
@@ -167,20 +167,12 @@ function generate(generator, scope, cb) {
           (err) => {
             // Expose a `error` handler in generators.
             if (err) {
-              const errorFn =
-                generator.error ||
-                function defaultError(err, scope, _cb) {
-                  return _cb(err)
-                }
+              const errorFn = generator.error || ((e, _, _cb) => _cb(e))
               return errorFn(err, scope, sb)
             }
 
             // Expose a `after` handler in generators (on success only).
-            const afterFn =
-              generator.after ||
-              function defaultAfter(scope, _cb) {
-                return _cb()
-              }
+            const afterFn = generator.after || ((_, _cb) => _cb())
             return afterFn(scope, sb)
           }
         )

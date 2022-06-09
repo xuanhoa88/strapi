@@ -1,8 +1,60 @@
 'use strict';
 
 /**
- * Read the documentation (https://strapi.io/documentation/developer-docs/latest/development/backend-customization.html#core-controllers)
- * to customize this controller
+ * <%= filename %> controller
+ *
+ * @description: A set of functions called "actions" for managing `<%= name %>`.
  */
 
-module.exports = {};
+module.exports = {
+
+  /**
+   * Retrieve <%= id %> records.
+   *
+   * @return {Object|Array}
+   */
+
+  find: async (ctx) => {
+    return strapi.api.<%= name %>.services.<%= id %>.search(ctx.query);
+  },
+
+  /**
+   * Retrieve a <%= id %> record.
+   *
+   * @return {Object}
+   */
+
+  findOne: async (ctx) => {
+    return strapi.api.<%= name %>.services.<%= id %>.fetch(ctx.params);
+  },
+
+  /**
+   * Create a/an <%= id %> record.
+   *
+   * @return {Object}
+   */
+
+  create: async (ctx) => {
+    return strapi.api.<%= name %>.services.<%= id %>.add(ctx.request.body);
+  },
+
+  /**
+   * Update a/an <%= id %> record.
+   *
+   * @return {Object}
+   */
+
+  update: async (ctx, next) => {
+    return strapi.api.<%= name %>.services.<%= id %>.edit(ctx.params, ctx.request.body) ;
+  },
+
+  /**
+   * Destroy a/an <%= id %> record.
+   *
+   * @return {Object}
+   */
+
+  destroy: async (ctx, next) => {
+    return strapi.api.<%= name %>.services.<%= id %>.remove(ctx.params);
+  }
+};

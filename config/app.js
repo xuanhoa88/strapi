@@ -1,3 +1,3 @@
 module.exports = {
-  storage: "/opt/storage/strapi",
+  storage: '/opt/storage/strapi',
 }

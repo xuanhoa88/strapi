@@ -1,14 +1,15 @@
-const _ = require("lodash")
+const _ = require('lodash')
 
 // files to load with filename key
 const prefixedPaths = [
-  "functions",
-  "policies",
-  "locales",
-  "hook",
-  "middleware",
-  "language",
-  "layout",
+  'functions',
+  'policies',
+  'locales',
+  'hooks',
+  'middlewares',
+  'language',
+  'layout',
+  'helpers',
 ]
 
 module.exports = function checkReservedFilenames(file) {

@@ -3,33 +3,37 @@
  */
 
 // Public node modules.
-const _ = require("lodash")
+const _ = require('lodash')
 
 // Strapi utilities.
-const { policy: policyUtils } = require("@strapi/utils")
-const finder = require("./finder")
+const policyUtils = require('./policy')
+const finder = require('./finder')
 
 const getMethod = (route) => _.trim(_.toLower(route.method))
 const getEndpoint = (route) => _.trim(route.path)
 
 module.exports = (strapi) =>
-  function routerChecker(value, plugin) {
+  function routerChecker(value, type, name) {
     const method = getMethod(value)
     const endpoint = getEndpoint(value)
 
     // Define controller and action names.
-    const [controllerName, actionName] = _.trim(value.handler).split(".")
+    const [controllerName, actionName] = _.trim(value.handler).split('.')
     const controllerKey = _.toLower(controllerName)
 
-    let controller
+    const isPlugin = type === 'plugin'
 
-    if (plugin) {
-      controller = strapi.plugins[plugin].controllers[controllerKey]
+    let controller
+    if (isPlugin) {
+      controller = _.get(strapi.plugins[name], ['controllers', controllerKey])
     } else {
-      controller = strapi.controllers[controllerKey]
+      controller = _.get(strapi.api[controllerKey], [
+        'controllers',
+        controllerKey,
+      ])
     }
 
-    if (!_.isFunction(controller[actionName])) {
+    if (!controller || !_.isFunction(controller[actionName])) {
       strapi.stopWithError(
         `Error creating endpoint ${method} ${endpoint}: handler not found "${controllerKey}.${actionName}"`
       )
@@ -39,8 +43,8 @@ module.exports = (strapi) =>
 
     // Retrieve the API's name where the controller is located
     // to access to the right validators
-    const currentApiName = finder(
-      strapi.plugins[plugin] || strapi.api,
+    const currentModule = finder(
+      isPlugin ? strapi.plugins[name] : strapi.api[name],
       controller
     )
 
@@ -48,25 +52,25 @@ module.exports = (strapi) =>
     const globalPolicy = policyUtils.globalPolicy({
       controller: controllerKey,
       action: actionName,
+      plugin: isPlugin ? name : null,
       method,
       endpoint,
-      plugin,
     })
 
     // Init policies array.
     const policies = [globalPolicy]
 
-    let policyOption = _.get(value, "config.policies")
+    let policyOption = _.get(value, 'config.policies')
 
     // Allow string instead of array of policies.
     if (_.isString(policyOption) && !_.isEmpty(policyOption)) {
       policyOption = [policyOption]
     }
 
-    if (_.isArray(policyOption) && plugin) {
+    if (_.isArray(policyOption) && name) {
       policyOption.forEach((policyName) => {
         try {
-          policies.push(policyUtils.get(policyName, plugin, currentApiName))
+          policies.push(policyUtils.get(policyName, name, currentModule))
         } catch (error) {
           strapi.stopWithError(
             `Error creating endpoint ${method} ${endpoint}: ${error.message}`

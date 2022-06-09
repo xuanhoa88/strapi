@@ -1,5 +1,5 @@
-const convert = require("koa-convert")
-const { csp } = require("koa-lusca")
+const convert = require('koa-convert')
+const { csp } = require('koa-lusca')
 /**
  * CSP hook
  */
@@ -10,9 +10,8 @@ module.exports = (strapi) => ({
    */
 
   initialize() {
-    strapi.app.use(
-      async (ctx, next) =>
-        await convert(csp(strapi.config.middleware.settings.csp))(ctx, next)
+    strapi.app.use(async (ctx, next) =>
+      convert(csp(strapi.config.middleware.settings.csp))(ctx, next)
     )
   },
 })

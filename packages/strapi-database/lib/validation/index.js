@@ -1,5 +1,5 @@
-const checkDuplicatedTableNames = require("./check-duplicated-table-names")
-const checkReservedNames = require("./check-reserved-names")
+const checkDuplicatedTableNames = require('./check-duplicated-table-names')
+const checkReservedNames = require('./check-reserved-names')
 
 const validateModelSchemas = ({ strapi, manager }) => {
   checkDuplicatedTableNames({ strapi, manager })

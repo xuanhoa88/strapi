@@ -1,8 +1,8 @@
 /**
  * Module dependencies
  */
-const convert = require("koa-convert")
-const { hsts } = require("koa-lusca")
+const convert = require('koa-convert')
+const { hsts } = require('koa-lusca')
 
 /**
  * HSTS hook
@@ -14,9 +14,8 @@ module.exports = (strapi) => ({
    */
 
   initialize() {
-    strapi.app.use(
-      async (ctx, next) =>
-        await convert(hsts(strapi.config.middleware.settings.hsts))(ctx, next)
+    strapi.app.use(async (ctx, next) =>
+      convert(hsts(strapi.config.middlewares.settings.hsts))(ctx, next)
     )
   },
 })

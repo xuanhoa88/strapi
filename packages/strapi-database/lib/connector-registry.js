@@ -2,8 +2,8 @@
  * Database connector registry
  */
 
-const _ = require("lodash")
-const requireConnector = require("./require-connector")
+const _ = require('lodash')
+const requireConnector = require('./require-connector')
 
 const createConnectorRegistry = ({ defaultConnection, connections }) => {
   const _connectors = new Map()
@@ -51,7 +51,7 @@ const createConnectorRegistry = ({ defaultConnection, connections }) => {
     getByConnection(connection) {
       if (!_.has(connections, connection)) {
         throw new Error(
-          "Trying to access a connector for an unknown connection"
+          'Trying to access a connector for an unknown connection'
         )
       }
 

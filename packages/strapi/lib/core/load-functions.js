@@ -1,5 +1,5 @@
-const fs = require("fs")
-const walk = require("./walk")
+const fs = require('fs')
+const walk = require('./walk')
 
 const loadFunction = (file) => {
   try {

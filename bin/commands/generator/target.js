@@ -4,127 +4,19 @@
 
 /* eslint-disable prefer-template */
 // Node.js core.
-const path = require("path")
-const util = require("util")
+const path = require('path')
+const util = require('util')
 
 // Public node modules.
-const _ = require("lodash")
-const asyncUntil = require("async/until")
-const report = require("reportback")()
+const _ = require('lodash')
+const asyncUntil = require('async/until')
+const report = require('reportback')()
 
 // Local dependencies.
-const folderHelper = require("./helpers/folder")
-const templateHelper = require("./helpers/template")
-const jsonFileHelper = require("./helpers/jsonfile")
-const copyHelper = require("./helpers/copy")
-
-/**
- * generateTarget()
- *
- * @param {Object} options
- */
-
-function generateTarget(options, cb) {
-  const sb = report.extend(cb)
-
-  // Options.
-  let { target } = options
-  let { scope } = options
-  const parentGenerator = options.parent
-  const { recursiveGenerate } = options
-
-  const maxResolves = 5
-  let _resolves = 0
-
-  asyncUntil(
-    (cb) => {
-      cb(null, isValidTarget(target) || ++_resolves > maxResolves)
-    },
-    (asyncCb) => {
-      parseTarget(target, scope, (err, resolvedTarget) => {
-        if (err) {
-          return asyncCb(err)
-        }
-        target = resolvedTarget
-        return asyncCb()
-      })
-    },
-    (err) => {
-      if (err) {
-        return sb(err)
-      }
-      if (!isValidTarget(target)) {
-        return sb(
-          new Error(
-            "Generator Error :: Could not resolve target `" +
-              scope.rootPath +
-              "` (probably a recursive loop)"
-          )
-        )
-      }
-
-      // Pass down parent Generator's template directory abs path.
-      scope.templatesDirectory = parentGenerator.templatesDirectory
-      if (target.copy) {
-        scope = mergeSubtargetScope(
-          scope,
-          typeof target.copy === "string"
-            ? {
-                templatePath: target.copy,
-              }
-            : target.copy
-        )
-        return copyHelper(scope, sb)
-      }
-
-      if (target.folder) {
-        scope = mergeSubtargetScope(scope, target.folder)
-        return folderHelper(scope, sb)
-      }
-
-      if (target.template) {
-        scope = mergeSubtargetScope(
-          scope,
-          typeof target.template === "string"
-            ? {
-                templatePath: target.template,
-              }
-            : target.template
-        )
-
-        return templateHelper(scope, sb)
-      }
-
-      if (target.jsonfile) {
-        if (typeof target.jsonfile === "object") {
-          scope = mergeSubtargetScope(scope, target.jsonfile)
-        } else if (typeof target.jsonfile === "function") {
-          scope = _.merge(scope, {
-            data: target.jsonfile(scope),
-          })
-        }
-        return jsonFileHelper(scope, sb)
-      }
-
-      // If we made it here, this must be a recursive generator.
-      // Now that the generator definition has been resolved,
-      // call this method recursively on it, passing along our
-      // callback.
-      if (++scope._depth > scope.maxHops) {
-        return sb(
-          new Error(
-            "`maxHops` (" +
-              scope.maxHops +
-              ") exceeded! There is probably a recursive loop in one of your generators."
-          )
-        )
-      }
-      return recursiveGenerate(target, scope, sb)
-    }
-  )
-}
-
-module.exports = generateTarget
+const folderUtils = require('./utils/folder')
+const templateUtils = require('./utils/template')
+const jsonFileUtils = require('./utils/jsonfile')
+const copyUtils = require('./utils/copy')
 
 /**
  * @param {[Type]} scope Description
@@ -142,10 +34,10 @@ function mergeSubtargetScope(scope, subtarget) {
  * @type {Array}
  */
 
-const knownHelpers = ["folder", "template", "jsonfile", "file", "copy"]
+const knownUtilss = ['folder', 'template', 'jsonfile', 'file', 'copy']
 
-function targetIsHelper(target) {
-  return _.some(target, (subTarget, key) => _.includes(knownHelpers, key))
+function targetIsUtils(target) {
+  return _.some(target, (subTarget, key) => _.includes(knownUtilss, key))
 }
 
 /**
@@ -156,34 +48,34 @@ function targetIsHelper(target) {
  */
 
 function parseTarget(target, scope, cb) {
-  if (typeof target === "string") {
+  if (typeof target === 'string') {
     target = {
       generator: target,
     }
   }
 
   // Interpret generator definition.
-  if (targetIsHelper(target)) {
+  if (targetIsUtils(target)) {
     return cb(null, target)
   }
 
   if (target.generator) {
     // Normalize the subgenerator reference.
     let subGeneratorRef
-    if (typeof target.generator === "string") {
+    if (typeof target.generator === 'string') {
       subGeneratorRef = {
         module: target.generator,
       }
-    } else if (typeof target.generator === "object") {
+    } else if (typeof target.generator === 'object') {
       subGeneratorRef = target.generator
     }
 
     if (!subGeneratorRef) {
       return cb(
         new Error(
-          "Generator Error :: Invalid subgenerator referenced for target `" +
+          'Generator Error :: Invalid subgenerator referenced for target `' +
             scope.rootPath +
-            "`"
+            '`'
         )
       )
     }
@@ -200,7 +92,7 @@ function parseTarget(target, scope, cb) {
     }
 
     // Otherwise, we'll attempt to load this subgenerator.
-    if (typeof subGeneratorRef.module === "string") {
+    if (typeof subGeneratorRef.module === 'string') {
       // Lookup the generator by name if a `module` was specified
       // This allows the module for a given generator to be
       // overridden.
@@ -239,7 +131,7 @@ function parseTarget(target, scope, cb) {
       try {
         const asDependencyInRootPath = path.resolve(
           scope.rootPath,
-          "node_modules",
+          'node_modules',
           module
         )
         subGenerator = require(asDependencyInRootPath)
@@ -253,7 +145,7 @@ function parseTarget(target, scope, cb) {
       try {
         subGenerator = require(path.resolve(
           process.cwd(),
-          "node_modules",
+          'node_modules',
           module
         ))
       } catch (e1) {
@@ -265,15 +157,15 @@ function parseTarget(target, scope, cb) {
     // try requiring `strapi-generate-<module>` to get the core generator.
     if (!subGenerator && !module.match(/^strapi-generate-/)) {
       try {
-        if (process.mainModule.filename.indexOf("yarn") !== -1) {
+        if (process.mainModule.filename.indexOf('yarn') !== -1) {
           subGenerator = require(path.resolve(
             process.mainModule.paths[2],
-            "strapi-generate-" + module
+            'strapi-generate-' + module
           ))
         } else {
           subGenerator = require(path.resolve(
             process.mainModule.paths[1],
-            "strapi-generate-" + module
+            'strapi-generate-' + module
           ))
         }
       } catch (e1) {
@@ -289,11 +181,11 @@ function parseTarget(target, scope, cb) {
     // But if we still can't find it, give up.
     return cb(
       new Error(
-        "Error: Failed to load `" +
+        'Error: Failed to load `' +
           subGeneratorRef.module +
-          "`..." +
-          (requireError ? " (" + requireError + ")" : "") +
-          ""
+          '`...' +
+          (requireError ? ' (' + requireError + ')' : '') +
+          ''
       )
     )
   }
@@ -315,11 +207,111 @@ function parseTarget(target, scope, cb) {
  */
 
 function isValidTarget(target) {
-  let ok = typeof target === "object"
+  let ok = typeof target === 'object'
 
   // Is using a helper.
   // Or is another generator def.
-  ok = ok && (targetIsHelper(target) || _.has(target, "targets"))
+  ok = ok && (targetIsUtils(target) || _.has(target, 'targets'))
 
   return ok
+}
+
+module.exports = (options, next) => {
+  const sb = report.extend(next)
+
+  // Options.
+  let { target } = options
+  let { scope } = options
+  const parentGenerator = options.parent
+  const { recursiveGenerate } = options
+
+  const maxResolves = 5
+  let _resolves = 0
+
+  asyncUntil(
+    (cb) => {
+      cb(null, isValidTarget(target) || ++_resolves > maxResolves)
+    },
+    (asyncCb) => {
+      parseTarget(target, scope, (err, resolvedTarget) => {
+        if (err) {
+          return asyncCb(err)
+        }
+        target = resolvedTarget
+        return asyncCb()
+      })
+    },
+    (err) => {
+      if (err) {
+        return sb(err)
+      }
+      if (!isValidTarget(target)) {
+        return sb(
+          new Error(
+            'Generator Error :: Could not resolve target `' +
+              scope.rootPath +
+              '` (probably a recursive loop)'
+          )
+        )
+      }
+
+      // Pass down parent Generator's template directory abs path.
+      scope.templatesDirectory = parentGenerator.templatesDirectory
+      if (target.copy) {
+        scope = mergeSubtargetScope(
+          scope,
+          typeof target.copy === 'string'
+            ? {
+                templatePath: target.copy,
+              }
+            : target.copy
+        )
+        return copyUtils(scope, sb)
+      }
+
+      if (target.folder) {
+        scope = mergeSubtargetScope(scope, target.folder)
+        return folderUtils(scope, sb)
+      }
+
+      if (target.template) {
+        scope = mergeSubtargetScope(
+          scope,
+          typeof target.template === 'string'
+            ? {
+                templatePath: target.template,
+              }
+            : target.template
+        )
+
+        return templateUtils(scope, sb)
+      }
+
+      if (target.jsonfile) {
+        if (typeof target.jsonfile === 'object') {
+          scope = mergeSubtargetScope(scope, target.jsonfile)
+        } else if (typeof target.jsonfile === 'function') {
+          scope = _.merge(scope, {
+            data: target.jsonfile(scope),
+          })
+        }
+        return jsonFileUtils(scope, sb)
+      }
+
+      // If we made it here, this must be a recursive generator.
+      // Now that the generator definition has been resolved,
+      // call this method recursively on it, passing along our
+      // callback.
+      if (++scope._depth > scope.maxHops) {
+        return sb(
+          new Error(
+            '`maxHops` (' +
+              scope.maxHops +
+              ') exceeded! There is probably a recursive loop in one of your generators.'
+          )
+        )
+      }
+      return recursiveGenerate(target, scope, sb)
+    }
+  )
 }

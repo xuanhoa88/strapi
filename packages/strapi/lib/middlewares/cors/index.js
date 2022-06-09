@@ -1,15 +1,15 @@
 /**
  * Module dependencies
  */
-const cors = require("@koa/cors")
-const _ = require("lodash")
+const cors = require('@koa/cors')
+const _ = require('lodash')
 
 const defaults = {
-  origin: "*",
+  origin: '*',
   maxAge: 31536000,
   credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
-  headers: ["Content-Type", "Authorization", "Origin", "Accept"],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+  headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
   keepHeadersOnError: false,
 }
 
@@ -26,7 +26,7 @@ module.exports = (strapi) => ({
       methods,
       headers,
       keepHeadersOnError,
-    } = _.assign({}, defaults, strapi.config.get("middleware.settings.cors"))
+    } = _.assign({}, defaults, strapi.config.get('middlewares.settings.cors'))
 
     strapi.app.use(
       cors({
@@ -47,7 +47,7 @@ module.exports = (strapi) => ({
 
           const requestOrigin = ctx.accept.headers.origin
 
-          if (_.includes(whitelist, "*")) {
+          if (_.includes(whitelist, '*')) {
             return requestOrigin
           }
 

@@ -1,6 +1,6 @@
 module.exports = {
   logger: {
-    level: "debug",
+    level: 'debug',
     exposeInContext: true,
     requests: true,
   },

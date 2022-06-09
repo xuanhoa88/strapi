@@ -1,11 +1,11 @@
-const _ = require("lodash")
+const _ = require('lodash')
 
-const { createQuery } = require("./queries")
-const createConnectorRegistry = require("./connector-registry")
-const constants = require("./constants")
-const { validateModelSchemas } = require("./validation")
-const createMigrationManager = require("./migration-manager")
-const createLifecycleManager = require("./lifecycle-manager")
+const { createQuery } = require('./queries')
+const createConnectorRegistry = require('./connector-registry')
+const constants = require('./constants')
+const { validateModelSchemas } = require('./validation')
+const createMigrationManager = require('./migration-manager')
+const createLifecycleManager = require('./lifecycle-manager')
 
 class DatabaseManager {
   constructor(strapi) {
@@ -14,8 +14,8 @@ class DatabaseManager {
     this.initialized = false
 
     this.connectors = createConnectorRegistry({
-      connections: strapi.config.get("database.connections"),
-      defaultConnection: strapi.config.get("database.defaultConnection"),
+      connections: strapi.config.get('database.connections'),
+      defaultConnection: strapi.config.get('database.defaultConnection'),
     })
 
     this.queries = new Map()
@@ -27,7 +27,7 @@ class DatabaseManager {
 
   async initialize() {
     if (this.initialized === true) {
-      throw new Error("Database manager already initialized")
+      throw new Error('Database manager already initialized')
     }
 
     this.initialized = true
@@ -50,13 +50,15 @@ class DatabaseManager {
   }
 
   initializeModelsMap() {
-    Object.keys(this.strapi.models).forEach((modelKey) => {
-      const model = this.strapi.models[modelKey]
-      this.models.set(model.uid, model)
+    _.keys(this.strapi.api).forEach((apiKey) => {
+      _.keys(this.strapi.api[apiKey].models).forEach((modelKey) => {
+        const model = this.strapi.api[apiKey].models[modelKey]
+        this.models.set(model.uid, model)
+      })
     })
 
-    Object.keys(this.strapi.plugins).forEach((pluginKey) => {
-      Object.keys(this.strapi.plugins[pluginKey].models).forEach((modelKey) => {
+    _.keys(this.strapi.plugins).forEach((pluginKey) => {
+      _.keys(this.strapi.plugins[pluginKey].models).forEach((modelKey) => {
         const model = this.strapi.plugins[pluginKey].models[modelKey]
         this.models.set(model.uid, model)
       })
@@ -94,10 +96,10 @@ class DatabaseManager {
   getModelFromStrapi(name, plugin) {
     const key = _.toLower(name)
     if (plugin) {
-      return _.get(strapi.plugins, [plugin, "models", key])
+      return _.get(strapi.plugins, [plugin, 'models', key])
     }
 
-    return _.get(strapi, ["models", key])
+    return _.get(strapi, ['models', key])
   }
 
   getModel(name, plugin) {

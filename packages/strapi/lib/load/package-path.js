@@ -1,4 +1,4 @@
-const path = require("path")
+const path = require('path')
 
 /**
  * Returns the path to a node modules root directory (not the main file path)

@@ -3,41 +3,41 @@
  */
 
 // Public node modules.
-const _ = require("lodash")
-const Boom = require("@hapi/boom")
-const delegate = require("delegates")
+const _ = require('lodash')
+const Boom = require('@hapi/boom')
+const delegate = require('delegates')
 
 const boomMethods = [
-  "badRequest",
-  "unauthorized",
-  "paymentRequired",
-  "forbidden",
-  "notFound",
-  "methodNotAllowed",
-  "notAcceptable",
-  "proxyAuthRequired",
-  "clientTimeout",
-  "conflict",
-  "resourceGone",
-  "lengthRequired",
-  "preconditionFailed",
-  "entityTooLarge",
-  "uriTooLong",
-  "unsupportedMediaType",
-  "rangeNotSatisfiable",
-  "expectationFailed",
-  "teapot",
-  "badData",
-  "locked",
-  "failedDependency",
-  "preconditionRequired",
-  "tooManyRequests",
-  "illegal",
-  "badImplementation",
-  "notImplemented",
-  "badGateway",
-  "serverUnavailable",
-  "gatewayTimeout",
+  'badRequest',
+  'unauthorized',
+  'paymentRequired',
+  'forbidden',
+  'notFound',
+  'methodNotAllowed',
+  'notAcceptable',
+  'proxyAuthRequired',
+  'clientTimeout',
+  'conflict',
+  'resourceGone',
+  'lengthRequired',
+  'preconditionFailed',
+  'entityTooLarge',
+  'uriTooLong',
+  'unsupportedMediaType',
+  'rangeNotSatisfiable',
+  'expectationFailed',
+  'teapot',
+  'badData',
+  'locked',
+  'failedDependency',
+  'preconditionRequired',
+  'tooManyRequests',
+  'illegal',
+  'badImplementation',
+  'notImplemented',
+  'badGateway',
+  'serverUnavailable',
+  'gatewayTimeout',
 ]
 
 const formatBoomPayload = (boomError) => {
@@ -62,7 +62,7 @@ module.exports = (strapi) => ({
    */
 
   initialize() {
-    this.delegator = delegate(strapi.app.context, "response")
+    this.delegator = delegate(strapi.app.context, 'response')
     this.createResponses()
 
     strapi.errors = Boom
@@ -72,8 +72,8 @@ module.exports = (strapi) => ({
         await next()
       } catch (error) {
         // emit error if configured
-        if (strapi.config.get("server.emitErrors", false)) {
-          strapi.app.emit("error", error, ctx)
+        if (strapi.config.get('server.emitErrors', false)) {
+          strapi.app.emit('error', error, ctx)
         }
 
         // Log error.
@@ -116,17 +116,17 @@ module.exports = (strapi) => ({
       this.delegator.method(method)
     })
 
-    strapi.app.response.send = function (data, status = 200) {
+    strapi.app.response.send = function send(data, status = 200) {
       this.status = status
       this.body = data
     }
 
-    strapi.app.response.created = function (data) {
+    strapi.app.response.created = function created(data) {
       this.status = 201
       this.body = data
     }
 
-    strapi.app.response.deleted = function (data) {
+    strapi.app.response.deleted = function deleted(data) {
       if (_.isNil(data)) {
         this.status = 204
       } else {
@@ -135,6 +135,6 @@ module.exports = (strapi) => ({
       }
     }
 
-    this.delegator.method("send").method("created").method("deleted")
+    this.delegator.method('send').method('created').method('deleted')
   },
 })

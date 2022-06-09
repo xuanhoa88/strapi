@@ -1,20 +1,20 @@
-const debug = require("debug")("strapi-database:migration")
-const { isFunction, get } = require("lodash/fp")
+const debug = require('debug')('strapi-database:migration')
+const { isFunction, get } = require('lodash/fp')
 
 class MigrationManager {
   constructor(db) {
-    debug("Initialize migration manager")
+    debug('Initialize migration manager')
     this.db = db
     this.migrations = []
   }
 
   register(migration) {
-    debug("Register migration")
+    debug('Register migration')
     this.migrations.push(migration)
   }
 
   async run(fn, options, context = {}) {
-    debug("Run migration")
+    debug('Run migration')
     await this.runBefore(options, context)
     await fn(options, context)
     await this.runAfter(options, context)
@@ -36,12 +36,12 @@ class MigrationManager {
   }
 
   async runBefore(options, context) {
-    debug("Run before migrations")
+    debug('Run before migrations')
 
     for (const migration of this.migrations) {
       const willRunStep = await this.shouldRun({
         migration,
-        step: "before",
+        step: 'before',
         options,
         context,
       })
@@ -53,12 +53,12 @@ class MigrationManager {
   }
 
   async runAfter(options, context) {
-    debug("Run after migrations")
+    debug('Run after migrations')
 
     for (const migration of this.migrations.slice(0).reverse()) {
       const willRunStep = await this.shouldRun({
         migration,
-        step: "after",
+        step: 'after',
         options,
         context,
       })

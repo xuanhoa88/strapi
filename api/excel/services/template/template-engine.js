@@ -1,27 +1,29 @@
-const fs = require("fs")
-const moment = require("moment")
-const TemplateExpression = require("./template-expression")
-const CellRange = require("./cell-range")
+const fs = require('fs')
+const moment = require('moment')
+const TemplateExpression = require('./template-expression')
+const CellRange = require('./cell-range')
 
 class TemplateEngine {
-  regExpBlocks = /\[\[.+?]]/g
-  regExpValues = /{{.+?}}/g
-  regExpStringPipeParameter = /^'.*'$/
-
   constructor(wsh, data, customPipes) {
     this.wsh = wsh
     this.data = data
     this.customPipes = customPipes
+
+    this.regExpBlocks = /\[\[.+?]]/g
+    this.regExpValues = /{{.+?}}/g
+    this.regExpStringPipeParameter = /^'.*'$/
   }
+
   execute() {
     this.processBlocks(this.wsh.getSheetDimension(), this.data)
     this.processValues(this.wsh.getSheetDimension(), this.data)
   }
+
   processBlocks(cellRange, data) {
     if (!cellRange.valid) {
       console.log(
-        "exceljs-template: Process blocks failed.",
-        "The cell range is invalid and will be skipped:",
+        'exceljs-template: Process blocks failed.',
+        'The cell range is invalid and will be skipped:',
         this.wsh.sheetName,
         cellRange
       )
@@ -32,7 +34,7 @@ class TemplateEngine {
       restart = false
       this.wsh.eachCell(cellRange, (cell) => {
         let cVal = cell.value
-        if (typeof cVal !== "string") {
+        if (typeof cVal !== 'string') {
           return null
         }
         const matches = cVal.match(this.regExpBlocks)
@@ -44,7 +46,7 @@ class TemplateEngine {
             rawExpression,
             rawExpression.slice(2, -2)
           )
-          cVal = cVal.replace(tplExp.rawExpression, "")
+          cVal = cVal.replace(tplExp.rawExpression, '')
           cell.value = cVal
           const resultData = this.processTplValues(tplExp, data)
           cellRange = this.processBlockPipes(
@@ -60,11 +62,12 @@ class TemplateEngine {
     } while (restart)
     return cellRange
   }
+
   processValues(cellRange, data) {
     if (!cellRange.valid) {
       console.log(
-        "exceljs-template: Process values failed.",
-        "The cell range is invalid and will be skipped:",
+        'exceljs-template: Process values failed.',
+        'The cell range is invalid and will be skipped:',
         this.wsh.sheetName,
         cellRange
       )
@@ -72,7 +75,7 @@ class TemplateEngine {
     }
     this.wsh.eachCell(cellRange, (cell) => {
       let cVal = cell.value
-      if (typeof cVal !== "string") {
+      if (typeof cVal !== 'string') {
         return
       }
       const matches = cVal.match(this.regExpValues)
@@ -93,11 +96,12 @@ class TemplateEngine {
       cell.value = cVal
     })
   }
+
   processTplValues(tplExp, data) {
     let resultData = data[tplExp.valueName]
     if (!resultData) {
       resultData = tplExp.valueName
-        .split(".")
+        .split('.')
         .reduce(
           (o, key) => ((o && o[key]) || o[key] === 0 ? o[key] : null),
           this.data
@@ -105,28 +109,28 @@ class TemplateEngine {
     }
     return resultData
   }
+
   processTplPipes(tplExp, data) {
-    let pipes = tplExp.pipes.map((p) => {
-      return (
-        (p.pipeParameters = p.pipeParameters.map((param) => {
-          if (this.regExpStringPipeParameter.test(param)) {
-            return param.slice(1, -1)
-          }
-          if (data[param] || data[param] === 0) {
-            return data[param]
-          }
-          return param
-            .split(".")
-            .reduce(
-              (o, key) => ((o && o[key]) || o[key] === 0 ? o[key] : null),
-              this.data
-            )
-        })),
-        p
-      )
+    const pipes = tplExp.pipes.map((p) => {
+      p.pipeParameters = p.pipeParameters.map((param) => {
+        if (this.regExpStringPipeParameter.test(param)) {
+          return param.slice(1, -1)
+        }
+        if (data[param] || data[param] === 0) {
+          return data[param]
+        }
+        return param
+          .split('.')
+          .reduce(
+            (o, key) => ((o && o[key]) || o[key] === 0 ? o[key] : null),
+            this.data
+          )
+      })
+      return p
     })
     return pipes
   }
+
   accountForZero(input) {
     if (input !== null && input !== undefined) {
       return input
@@ -136,63 +140,63 @@ class TemplateEngine {
     }
     return null
   }
+
   processValuePipes(cell, pipes, value) {
     try {
       pipes.forEach((pipe) => {
         if (
           this.customPipes[pipe.pipeName] &&
-          typeof this.customPipes[pipe.pipeName] === "function"
+          typeof this.customPipes[pipe.pipeName] === 'function'
         ) {
           value = this.customPipes[pipe.pipeName](value, ...pipe.pipeParameters)
           return
         }
         switch (pipe.pipeName) {
-          case "date":
+          case 'date':
             // value = this.valuePipeDate(value, ...pipe.pipeParameters);
             value = this.valuePipeDate(value)
             break
-          case "image":
+          case 'image':
             // value = this.valuePipeImage(cell, value, ...pipe.pipeParameters);
             value = this.valuePipeImage(cell, value)
             break
-          case "find":
+          case 'find':
             value = this.valuePipeFind(value, ...pipe.pipeParameters)
             break
-          case "get":
+          case 'get':
             value = this.valuePipeGet(value, ...pipe.pipeParameters)
             break
-          case "time":
+          case 'time':
             value = this.valuePipeTime(value)
             break
-          case "datetime":
+          case 'datetime':
             value = this.valuePipeDateTime(value)
             break
-          case "number":
+          case 'number':
             value = this.valuePipeNumber(value)
             break
           default:
-            value =
-              "exceljs-template: The value pipe not found:" + pipe.pipeName
+            value = `exceljs-template: The value pipe not found:${pipe.pipeName}`
             console.warn(value)
         }
       })
     } catch (error) {
-      console.error("exceljs-template: Error on process values of pipes", error)
-      return "exceljs-template: Error on process values of pipes. Look for more details in a console."
+      console.error('exceljs-template: Error on process values of pipes', error)
+      return 'exceljs-template: Error on process values of pipes. Look for more details in a console.'
     }
     if (value === 0) {
       return value
     }
-    return value || ""
+    return value || ''
   }
+
   processBlockPipes(cellRange, cell, pipes, data) {
     const newRange = CellRange.createFromRange(cellRange)
     let insertedRows
     try {
       pipes.forEach((pipe) => {
         switch (pipe.pipeName) {
-          case "repeat-rows":
-            // insertedRows = this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
+          case 'repeat-rows':
             insertedRows = this.blockPipeRepeatRows(
               cell,
               data,
@@ -200,7 +204,7 @@ class TemplateEngine {
             )
             newRange.bottom += insertedRows
             break
-          case "tile":
+          case 'tile':
             insertedRows = this.blockPipeTile(
               cell,
               data,
@@ -208,12 +212,12 @@ class TemplateEngine {
             )
             newRange.bottom += insertedRows
             break
-          case "filter":
+          case 'filter':
             data = this.blockPipeFilter(data, ...pipe.pipeParameters)
             break
           default:
             console.warn(
-              "exceljs-template: The block pipe not found:",
+              'exceljs-template: The block pipe not found:',
               pipe.pipeName,
               pipe.pipeParameters
             )
@@ -221,14 +225,15 @@ class TemplateEngine {
       })
     } catch (error) {
       console.error(
-        "exceljs-template: Error on process a block of pipes",
+        'exceljs-template: Error on process a block of pipes',
         error
       )
       cell.value =
-        "exceljs-template: Error on process a block of pipes. Look for more details in a console."
+        'exceljs-template: Error on process a block of pipes. Look for more details in a console.'
     }
     return newRange
   }
+
   valuePipeNumber(value) {
     if (Number(value) && value % 1 !== 0) {
       return parseFloat(value)
@@ -238,15 +243,19 @@ class TemplateEngine {
     }
     return value
   }
+
   valuePipeDate(date) {
-    return date ? moment(new Date(date)).format("DD.MM.YYYY") : ""
+    return date ? moment(new Date(date)).format('DD.MM.YYYY') : ''
   }
+
   valuePipeTime(date) {
-    return date ? moment(new Date(date)).format("HH:mm:ss") : ""
+    return date ? moment(new Date(date)).format('HH:mm:ss') : ''
   }
+
   valuePipeDateTime(date) {
-    return date ? moment(new Date(date)).format("DD.MM.YYYY HH:mm:ss") : ""
+    return date ? moment(new Date(date)).format('DD.MM.YYYY HH:mm:ss') : ''
   }
+
   valuePipeImage(cell, fileName) {
     if (fs.existsSync(fileName)) {
       this.wsh.addImage(fileName, cell)
@@ -254,6 +263,7 @@ class TemplateEngine {
     }
     return ``
   }
+
   /** Find object in array by value of a property */
   valuePipeFind(arrayData, propertyName, propertyValue) {
     if (Array.isArray(arrayData) && propertyName && propertyName) {
@@ -262,20 +272,22 @@ class TemplateEngine {
           item &&
           item[propertyName] &&
           item[propertyName].length > 0 &&
-          item[propertyName] == propertyValue
+          item[propertyName] === propertyValue
       )
     }
     return null
   }
+
   valuePipeGet(data, propertyName) {
     return (data && propertyName && data[propertyName]) || null
   }
+
   blockPipeFilter(dataArray, propertyName, propertyValue) {
     if (Array.isArray(dataArray) && propertyName) {
       if (propertyValue) {
         return dataArray.filter(
           (item) =>
-            typeof item === "object" &&
+            typeof item === 'object' &&
             item[propertyName] &&
             item[propertyName].length > 0 &&
             item[propertyName] === propertyValue
@@ -283,7 +295,7 @@ class TemplateEngine {
       }
       return dataArray.filter(
         (item) =>
-          typeof item === "object" &&
+          typeof item === 'object' &&
           item.hasOwnProperty(propertyName) &&
           item[propertyName] &&
           item[propertyName].length > 0
@@ -291,13 +303,14 @@ class TemplateEngine {
     }
     return dataArray
   }
+
   /** @return {number} count of inserted rows */
   blockPipeRepeatRows(cell, dataArray, countRows) {
     if (!Array.isArray(dataArray) || !dataArray.length) {
       console.warn(
-        "TemplateEngine.blockPipeRepeatRows",
+        'TemplateEngine.blockPipeRepeatRows',
         cell.address,
-        "The data must be not empty array, but got:",
+        'The data must be not empty array, but got:',
         dataArray
       )
       return 0
@@ -322,14 +335,15 @@ class TemplateEngine {
     })
     return (dataArray.length - 1) * countRows
   }
+
   /** @return {number} count of inserted rows */
   blockPipeTile(cell, dataArray, blockRows, blockColumns, tileColumns) {
     // return;
     if (!Array.isArray(dataArray) || !dataArray.length) {
       console.warn(
-        "TemplateEngine.blockPipeTile",
+        'TemplateEngine.blockPipeTile',
         cell.address,
-        "The data must be not empty array, but got:",
+        'The data must be not empty array, but got:',
         dataArray
       )
       return 0
@@ -347,8 +361,8 @@ class TemplateEngine {
     if (dataArray.length > tileColumns) {
       this.wsh.cloneRows(blockRange.top, blockRange.bottom, cloneRowsCount)
     }
-    let tileColumn = 1,
-      tileRange = CellRange.createFromRange(blockRange)
+    let tileColumn = 1
+    let tileRange = CellRange.createFromRange(blockRange)
     dataArray.forEach((data, idx, array) => {
       // Prepare the next tile
       if (idx !== array.length - 1 && tileColumn + 1 <= tileColumns) {

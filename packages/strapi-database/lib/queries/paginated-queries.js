@@ -1,4 +1,4 @@
-const _ = require("lodash")
+const _ = require('lodash')
 
 const withDefaultPagination = (params) => {
   const { page = 1, pageSize = 100, ...rest } = params
@@ -30,7 +30,7 @@ const getPaginationQuery = async (queryParams, count, ...args) => {
 const createPaginatedQuery =
   ({ fetch, count }) =>
   async (queryParams, ...args) => {
-    const params = _.omit(queryParams, ["page", "pageSize"])
+    const params = _.omit(queryParams, ['page', 'pageSize'])
     const pagination = await getPaginationQuery(queryParams, count, ...args)
 
     Object.assign(params, paginationToQueryParams(pagination))

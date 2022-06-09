@@ -1,14 +1,14 @@
-const path = require("path")
-const fs = require("fs")
-const { templateConfiguration, env } = require("@strapi/utils")
-const { isNotJunk } = require("../../utils/junk")
+const path = require('path')
+const fs = require('fs')
+const { templateConfiguration, env } = require('@strapi/utils')
+const { isNotJunk } = require('../../utils/junk')
 
 const loadJsFile = (file) => {
   try {
     const jsModule = require(file)
 
     // call if function
-    if (typeof jsModule === "function") {
+    if (typeof jsModule === 'function') {
       return jsModule({ env })
     }
 
@@ -30,9 +30,9 @@ const loadFile = (file) => {
   const ext = path.extname(file)
 
   switch (ext) {
-    case ".js":
+    case '.js':
       return loadJsFile(file)
-    case ".json":
+    case '.json':
       return loadJSONFile(file)
     default:
       return {}

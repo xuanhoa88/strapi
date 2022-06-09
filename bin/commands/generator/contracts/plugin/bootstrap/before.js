@@ -3,10 +3,11 @@
  */
 
 // Public node modules.
-const path = require("path")
-const fs = require("fs")
-const _ = require("lodash")
-const { nameToSlug } = require("@strapi/utils")
+const path = require('path')
+const fs = require('fs')
+const _ = require('lodash')
+const pluralize = require('pluralize')
+const { nameToSlug } = require('@strapi/utils')
 
 /**
  * This `before` function is run before generating targets.
@@ -18,7 +19,7 @@ const { nameToSlug } = require("@strapi/utils")
 
 module.exports = (scope, cb) => {
   if (!scope.rootPath || !scope.id) {
-    return cb.invalid("Usage: `$ strapi generate:plugin pluginName`")
+    return cb.invalid('Usage: `$ strapi generate:plugin pluginName`')
   }
 
   // Format `id`.
@@ -28,17 +29,20 @@ module.exports = (scope, cb) => {
   _.defaults(scope, {
     name,
     year: new Date().getFullYear(),
-    license: "MIT",
+    license: 'MIT',
   })
 
   // Take another pass to take advantage of the defaults absorbed in previous passes.
   _.defaults(scope, {
+    route: _.kebabCase(pluralize(name)),
     filename: `${name}.js`,
-    filePath: "./plugins",
+    filePath: './plugins',
   })
 
-  const pluginDir = path.resolve(scope.rootPath, "plugins")
-  fs.ensureDirSync(pluginDir)
+  const pluginDir = path.resolve(scope.rootPath, 'plugins')
+  if (!fs.existsSync(pluginDir)) {
+    fs.mkdirSync(pluginDir)
+  }
 
   // Trigger callback with no error to proceed.
   return cb.success()

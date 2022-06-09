@@ -2,7 +2,7 @@
  * Module dependencies
  */
 
-const _ = require("lodash")
+const _ = require('lodash')
 
 /**
  * Find controller's location
@@ -10,15 +10,15 @@ const _ = require("lodash")
 
 module.exports = (api, controller) => {
   if (!_.isObject(api)) {
-    throw new Error("Should be an object")
+    throw new Error('Should be an object')
   }
 
-  if (_.isObject(controller) && _.has(controller, "identity")) {
-    controller = controller.identity.toLowerCase()
+  if (_.isObject(controller) && _.has(controller, 'uid')) {
+    controller = _.toLower(controller.uid)
   } else if (_.isString(controller)) {
-    controller = controller.toLowerCase()
+    controller = _.toLower(controller)
   } else {
-    throw new Error("Should be an object or a string")
+    throw new Error('Should be an object or a string')
   }
 
   const where = _.findKey(api, (o) => _.get(o, `controllers.${controller}`))

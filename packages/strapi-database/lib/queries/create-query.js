@@ -1,11 +1,11 @@
-const pmap = require("p-map")
+const pmap = require('p-map')
 
-const { createQueryWithLifecycles, withLifecycles } = require("./helpers")
-const { createRelationsCountsQuery } = require("./relations-counts-queries")
+const { createQueryWithLifecycles, withLifecycles } = require('./helpers')
+const { createRelationsCountsQuery } = require('./relations-counts-queries')
 const {
   createFindPageQuery,
   createSearchPageQuery,
-} = require("./paginated-queries")
+} = require('./paginated-queries')
 
 /**
  * @param {Object} opts options
@@ -16,7 +16,7 @@ module.exports = function createQuery(opts) {
   const { model, connectorQuery } = opts
 
   const createFn = createQueryWithLifecycles({
-    query: "create",
+    query: 'create',
     model,
     connectorQuery,
   })
@@ -28,7 +28,7 @@ module.exports = function createQuery(opts) {
     })
 
   const findPage = withLifecycles({
-    query: "findPage",
+    query: 'findPage',
     model,
     fn: createFindPageQuery(connectorQuery),
   })
@@ -40,7 +40,7 @@ module.exports = function createQuery(opts) {
   })
 
   const searchPage = withLifecycles({
-    query: "searchPage",
+    query: 'searchPage',
     model,
     fn: createSearchPageQuery(connectorQuery),
   })
@@ -72,7 +72,7 @@ module.exports = function createQuery(opts) {
      * Run custom database logic
      */
     custom(mapping) {
-      if (typeof mapping === "function") {
+      if (typeof mapping === 'function') {
         return mapping.bind(this, { model: this.model })
       }
 
@@ -80,7 +80,7 @@ module.exports = function createQuery(opts) {
         throw new Error(`Missing mapping for orm ${this.orm}`)
       }
 
-      if (typeof mapping[this.orm] !== "function") {
+      if (typeof mapping[this.orm] !== 'function') {
         throw new Error(
           `Custom queries must be functions received ${typeof mapping[
             this.orm
@@ -94,29 +94,29 @@ module.exports = function createQuery(opts) {
     create: createFn,
     createMany,
     update: createQueryWithLifecycles({
-      query: "update",
+      query: 'update',
       model,
       connectorQuery,
     }),
     delete: createQueryWithLifecycles({
-      query: "delete",
+      query: 'delete',
       model,
       connectorQuery,
     }),
-    find: createQueryWithLifecycles({ query: "find", model, connectorQuery }),
+    find: createQueryWithLifecycles({ query: 'find', model, connectorQuery }),
     findOne: createQueryWithLifecycles({
-      query: "findOne",
+      query: 'findOne',
       model,
       connectorQuery,
     }),
-    count: createQueryWithLifecycles({ query: "count", model, connectorQuery }),
+    count: createQueryWithLifecycles({ query: 'count', model, connectorQuery }),
     search: createQueryWithLifecycles({
-      query: "search",
+      query: 'search',
       model,
       connectorQuery,
     }),
     countSearch: createQueryWithLifecycles({
-      query: "countSearch",
+      query: 'countSearch',
       model,
       connectorQuery,
     }),

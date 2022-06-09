@@ -3,25 +3,25 @@
  */
 
 // Node.js core.
-const path = require("path")
+const path = require('path')
 
 // Public node modules.
-const _ = require("lodash")
-const fs = require("fs")
-const reportback = require("reportback")()
+const _ = require('lodash')
+const fs = require('fs')
+const reportback = require('reportback')()
 
 // Local dependencies.
-const fileHelper = require("../file")
+const fileUtils = require('../file')
 
 /**
  * Read a dynamic template, compile it using scope.
  * Then use `file` helper to write it to its destination.
  */
 
-module.exports = function (options, cb) {
+module.exports = (options, cb) => {
   cb = reportback.extend(cb, {
-    noTemplate: "error",
-    alreadyExists: "error",
+    noTemplate: 'error',
+    alreadyExists: 'error',
   })
 
   // Compute the canonical path to a template
@@ -36,12 +36,12 @@ module.exports = function (options, cb) {
     options.templatePath
   )
 
-  fs.readFile(absTemplatePath, "utf8", (err, contents) => {
+  fs.readFile(absTemplatePath, 'utf8', (err, contents) => {
     if (err) {
       err = err instanceof Error ? err : new Error(err)
       err.message = `Template error: ${err.message}`
       err.path = absTemplatePath
-      if (err.code === "ENOENT") {
+      if (err.code === 'ENOENT') {
         return cb.noTemplate(err)
       }
       return cb(err)
@@ -62,7 +62,7 @@ module.exports = function (options, cb) {
       return cb(e)
     }
 
-    return fileHelper(
+    return fileUtils(
       _.merge(options, {
         contents,
       }),

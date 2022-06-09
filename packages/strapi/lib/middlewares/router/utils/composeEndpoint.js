@@ -1,16 +1,20 @@
-const _ = require("lodash")
-const compose = require("koa-compose")
-const createRouteChecker = require("./routerChecker")
+const _ = require('lodash')
+const compose = require('koa-compose')
+const createRouteChecker = require('./routerChecker')
 
 module.exports = (strapi) => {
   const routerChecker = createRouteChecker(strapi)
 
-  return (value, { plugin, router }) => {
-    if (_.isEmpty(_.get(value, "method")) || _.isEmpty(_.get(value, "path"))) {
+  return (value, { type, name, router }) => {
+    if (_.isEmpty(_.get(value, 'method')) || _.isEmpty(_.get(value, 'path'))) {
       return
     }
 
-    const { method, endpoint, policies, action } = routerChecker(value, plugin)
+    const { method, endpoint, policies, action } = routerChecker(
+      value,
+      type,
+      name
+    )
 
     if (_.isUndefined(action) || !_.isFunction(action)) {
       return strapi.log.warn(

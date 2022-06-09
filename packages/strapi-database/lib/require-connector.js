@@ -1,4 +1,4 @@
-const VError = require("verror")
+const VError = require('verror')
 
 /**
  * Requires a database connector
@@ -8,8 +8,8 @@ const VError = require("verror")
 module.exports = function requireConnector(connector) {
   if (!connector) {
     throw new VError(
-      { name: "ConnectorError" },
-      "initialize connector without name"
+      { name: 'ConnectorError' },
+      'initialize connector without name'
     )
   }
 
@@ -17,7 +17,7 @@ module.exports = function requireConnector(connector) {
     require.resolve(`../../strapi-connector-${connector}/lib`)
   } catch (error) {
     throw new VError(
-      { name: "ConnectorError", cause: error },
+      { name: 'ConnectorError', cause: error },
       'connector "%s" not found',
       connector
     )
@@ -27,7 +27,7 @@ module.exports = function requireConnector(connector) {
     return require(`../../strapi-connector-${connector}/lib`)
   } catch (error) {
     throw new VError(
-      { name: "ConnectorError", cause: error },
+      { name: 'ConnectorError', cause: error },
       'initialize connector "%s"',
       connector
     )

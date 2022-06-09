@@ -1,4 +1,4 @@
-const _ = require("lodash")
+const _ = require('lodash')
 
 module.exports = (strapi) => ({
   initialize() {
@@ -6,8 +6,8 @@ module.exports = (strapi) => ({
       await next()
 
       const responseFn = strapi.config.get([
-        "functions",
-        "responses",
+        'functions',
+        'responses',
         ctx.status,
       ])
       if (_.isFunction(responseFn)) {

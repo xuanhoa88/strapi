@@ -15,7 +15,7 @@ module.exports = (strapi) => ({
 
       const delta = Math.ceil(Date.now() - start)
 
-      ctx.set("X-Response-Time", delta + "ms") // eslint-disable-line prefer-template
+      ctx.set('X-Response-Time', delta + 'ms') // eslint-disable-line prefer-template
     })
   },
 })

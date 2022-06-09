@@ -1,12 +1,12 @@
-const body = require("koa-body")
-const qs = require("qs")
-const { omit } = require("lodash")
+const body = require('koa-body')
+const qs = require('qs')
+const { omit } = require('lodash')
 
 /**
  * Body parser hook
  */
 const addQsParser = (app, settings) => {
-  Object.defineProperty(app.request, "query", {
+  Object.defineProperty(app.request, 'query', {
     configurable: false,
     enumerable: true,
     /*
@@ -14,7 +14,7 @@ const addQsParser = (app, settings) => {
      */
     get() {
       const qstr = this.querystring
-      const cache = (this._querycache = this._querycache || {})
+      const cache = this._querycache || {}
       return cache[qstr] || (cache[qstr] = qs.parse(qstr, settings))
     },
 
@@ -39,16 +39,16 @@ module.exports = (strapi) => ({
         return await body({
           patchKoa: true,
           ...omit(
-            strapi.config.middleware.settings.parser,
-            "queryStringParser"
+            strapi.config.middlewares.settings.parser,
+            'queryStringParser'
           ),
         })(ctx, next)
       } catch (e) {
-        if ((e || {}).message && e.message.includes("maxFileSize exceeded")) {
-          throw strapi.errors.entityTooLarge("FileTooBig", {
+        if ((e || {}).message && e.message.includes('maxFileSize exceeded')) {
+          throw strapi.errors.entityTooLarge('FileTooBig', {
             errors: [
               {
-                id: "Upload.status.sizeLimit",
+                id: 'Upload.status.sizeLimit',
                 message: `file is bigger than the limit size!`,
               },
             ],
@@ -60,7 +60,7 @@ module.exports = (strapi) => ({
 
     addQsParser(
       strapi.app,
-      strapi.config.get("middleware.settings.parser.queryStringParser")
+      strapi.config.get('middlewares.settings.parser.queryStringParser')
     )
   },
 })

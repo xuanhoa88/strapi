@@ -6,29 +6,29 @@ const {
   isFunction,
   isNil,
   keys,
-} = require("lodash")
+} = require('lodash')
 
 module.exports = async (strapi) => {
-  const { hook: hookConfig } = strapi.config
+  const { hooks: hookConfig } = strapi.config
 
   // check if a hook exists
-  const hookExists = (key) => !isNil(strapi.hook[key])
+  const hookExists = (key) => !isNil(strapi.hooks[key])
 
   // check if a hook is enabled
   const hookEnabled = (key) =>
-    get(hookConfig, ["settings", key, "enabled"], false) === true
+    get(hookConfig, ['settings', key, 'enabled'], false) === true
 
   // list of enabled hooks
-  const enableddHook = keys(strapi.hook).filter(hookEnabled)
+  const enableddHook = keys(strapi.hooks).filter(hookEnabled)
 
   // Method to initialize hooks and emit an event.
   const initialize = (hookKey) => {
-    if (strapi.hook[hookKey].loaded === true) return
+    if (strapi.hooks[hookKey].loaded === true) return
 
-    const { load } = strapi.hook[hookKey]
+    const { load } = strapi.hooks[hookKey]
     const hookTimeout = get(
       hookConfig,
-      ["settings", hookKey, "timeout"],
+      ['settings', hookKey, 'timeout'],
       hookConfig.timeout
     )
 
@@ -38,7 +38,7 @@ module.exports = async (strapi) => {
         hookTimeout || 1000
       )
 
-      strapi.hook[hookKey] = merge(strapi.hook[hookKey], load)
+      strapi.hooks[hookKey] = merge(strapi.hooks[hookKey], load)
 
       const onFinish = (err) => {
         if (err) {
@@ -46,7 +46,7 @@ module.exports = async (strapi) => {
           return reject(err)
         }
 
-        strapi.hook[hookKey].loaded = true
+        strapi.hooks[hookKey].loaded = true
 
         strapi.app.emit(`hook:${hookKey}:loaded`)
 
@@ -60,7 +60,7 @@ module.exports = async (strapi) => {
         .then(() => load.initialize(onFinish))
         .then(() => {
           clearTimeout(timeout)
-          strapi.hook[hookKey].loaded = true
+          strapi.hooks[hookKey].loaded = true
           resolve()
         })
         .catch((err) => {
@@ -80,7 +80,7 @@ module.exports = async (strapi) => {
   // Run beforeInitialize of every hook
   await Promise.all(
     enableddHook.map((key) => {
-      const { beforeInitialize } = strapi.hook[key].load
+      const { beforeInitialize } = strapi.hooks[key].load
       if (isFunction(beforeInitialize)) {
         return beforeInitialize()
       }
@@ -93,15 +93,15 @@ module.exports = async (strapi) => {
     await Promise.all(uniq(hooks).map((key) => initialize(key)))
   }
 
-  const hooksBefore = get(hookConfig, "load.before", [])
+  const hooksBefore = get(hookConfig, 'load.before', [])
     .filter(hookExists)
     .filter(hookEnabled)
 
-  const hooksAfter = get(hookConfig, "load.after", [])
+  const hooksAfter = get(hookConfig, 'load.after', [])
     .filter(hookExists)
     .filter(hookEnabled)
 
-  const hooksOrder = get(hookConfig, "load.order", [])
+  const hooksOrder = get(hookConfig, 'load.order', [])
     .filter(hookExists)
     .filter(hookEnabled)
 

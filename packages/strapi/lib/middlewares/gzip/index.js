@@ -1,7 +1,7 @@
 /**
  * Gzip hook
  */
-const compress = require("koa-compress")
+const compress = require('koa-compress')
 
 module.exports = (strapi) => ({
   /**
@@ -9,7 +9,7 @@ module.exports = (strapi) => ({
    */
 
   initialize() {
-    const { options = {} } = strapi.config.middleware.settings.gzip
+    const { options = {} } = strapi.config.middlewares.settings.gzip
     strapi.app.use(compress(options))
   },
 })

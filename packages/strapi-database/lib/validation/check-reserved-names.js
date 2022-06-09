@@ -1,5 +1,5 @@
-const _ = require("lodash")
-const constants = require("../constants")
+const _ = require('lodash')
+const constants = require('../constants')
 
 class ModelError extends Error {
   constructor(message) {
@@ -11,7 +11,7 @@ class ModelError extends Error {
 const checkReservedAttributeNames = (model, { manager }) => {
   const reservedNames = [...constants.RESERVED_ATTRIBUTE_NAMES]
 
-  if (_.has(model, "options.timestamps")) {
+  if (_.has(model, 'options.timestamps')) {
     const [connectorCreatedAt, connectorUpdatedAt] =
       manager.connectors.getByConnection(model.connection).defaultTimestamps
 
@@ -28,7 +28,7 @@ const checkReservedAttributeNames = (model, { manager }) => {
   }
 
   const usedReservedAttributeNames = _.intersection(
-    Object.keys(model.attributes),
+    _.keys(model.attributes),
     reservedNames
   )
 
@@ -37,7 +37,7 @@ const checkReservedAttributeNames = (model, { manager }) => {
       `Model "${
         model.modelName
       }" is using reserved attribute names "${usedReservedAttributeNames.join(
-        ", "
+        ', '
       )}".\n-> Make sure you are not using a reserved name or overriding the defined timestamp attributes.`
     )
   }
