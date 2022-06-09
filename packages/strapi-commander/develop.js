@@ -1,7 +1,7 @@
 const cluster = require('cluster')
 const chokidar = require('chokidar')
 const { createLogger } = require('@strapi/logger')
-const loadConfiguration = require('../../packages/strapi/lib/core/load-configuration')
+const loadConfiguration = require('../strapi/core/load-configuration')
 
 const strapi = require('../../server')
 

@@ -10,7 +10,7 @@ module.exports = {
         ctx.request.body
       )
     } catch (err) {
-      ctx.badRequest()
+      ctx.badRequest(err.message, err.data)
     }
   },
   async download(ctx) {
@@ -21,7 +21,7 @@ module.exports = {
 
       ctx.attachment(displayName)
     } catch (err) {
-      ctx.badRequest(err.message)
+      ctx.badRequest(err.message, err.data)
     }
   },
 }

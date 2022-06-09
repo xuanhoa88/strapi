@@ -6,7 +6,7 @@
  */
 
 // Strapi.
-const strapi = require('./packages/strapi/lib/Strapi')
+const strapi = require('./packages/strapi/Strapi')
 
 process.on('unhandledRejection', (reason, p) => {
   console.log(reason, 'Unhandled Rejection at Promise', p)

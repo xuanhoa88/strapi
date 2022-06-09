@@ -4,7 +4,6 @@
  */
 const fs = require('fs')
 const path = require('path')
-const Joi = require('joi')
 const uuid = require('uuid')
 
 const { xlsxBuildByTemplate } = require('./template/utils')
@@ -61,14 +60,14 @@ module.exports = {
 
   async downloadFile(fileName) {
     try {
-      const schema = Joi.object({
-        fileName: Joi.string().required(),
-      })
-      await schema.validateAsync(
+      await strapi.validator.validateEntity(
+        (Joi) =>
+          Joi.object({
+            fileName: Joi.string().required(),
+          }),
         {
           fileName,
-        },
-        { abortEarly: false }
+        }
       )
 
       const downloadFilePath = path.join(
@@ -85,18 +84,6 @@ module.exports = {
         displayName: path.basename(fileName),
       }
     } catch (err) {
-      if (err.inner) {
-        const allErrors = err.inner.reduce(
-          (errors, currentValidation) =>
-            Object.assign(errors, {
-              [currentValidation.path]: currentValidation.errors[0], // first error is enough for this demo
-            }),
-          {}
-        )
-        console.log('form error:', allErrors)
-        throw allErrors
-      }
-
       strapi.log.error(err)
       throw err
     }

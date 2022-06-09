@@ -11,13 +11,14 @@ const { getAbsoluteServerUrl } = require('@strapi/utils')
 const { createLogger } = require('@strapi/logger')
 const {
   createDatabaseManager,
-} = require('../../strapi-database/lib/database-manager')
+} = require('../strapi-database/lib/database-manager')
 const register = require('./core/register')
 const loadConfiguration = require('./core/load-configuration')
 const loadModules = require('./core/load-modules')
 const initializeMiddlewares = require('./middlewares')
 const initializeHooks = require('./hooks')
 const createStrapiFs = require('./core/fs')
+const createValidator = require('./services/validator')
 
 const LIFECYCLES = {
   REGISTER: 'register',
@@ -270,6 +271,8 @@ class Strapi {
 
     await this.runLifecyclesFunctions(LIFECYCLES.REGISTER)
     await this.db.initialize()
+
+    this.validator = createValidator(this)
 
     // Initialize hooks and middlewares.
     await initializeMiddlewares(this)
