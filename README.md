@@ -46,7 +46,7 @@ npm run dev
 │   │   │   ├── security.json  -> security config (e.g CSRF)
 │   │   │   └── server.json    -> host, port & middeware config
 │   └── locales            -> translations
-├── data
+├── database
 │   ├── migrations         -> database migrations
 │   └── seeds              -> database seeds
 ```

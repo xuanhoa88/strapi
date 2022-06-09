@@ -1,7 +1,6 @@
 const pmap = require('p-map')
 const _ = require('lodash')
 const { createQueryWithLifecycles, withLifecycles } = require('./helpers')
-const { createRelationsCountsQuery } = require('./relations-counts-queries')
 const {
   createFindPageQuery,
   createSearchPageQuery,
@@ -33,22 +32,10 @@ module.exports = function createQuery(opts) {
     fn: createFindPageQuery(connectorQuery),
   })
 
-  const findWithRelationCounts = createRelationsCountsQuery({
-    model,
-    fn: findPage,
-    connectorQuery,
-  })
-
   const searchPage = withLifecycles({
     query: 'searchPage',
     model,
     fn: createSearchPageQuery(connectorQuery),
-  })
-
-  const searchWithRelationCounts = createRelationsCountsQuery({
-    model,
-    fn: searchPage,
-    connectorQuery,
   })
 
   return {
@@ -124,8 +111,5 @@ module.exports = function createQuery(opts) {
     // paginated queries
     findPage,
     searchPage,
-
-    searchWithRelationCounts,
-    findWithRelationCounts,
   }
 }

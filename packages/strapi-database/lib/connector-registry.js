@@ -6,7 +6,7 @@ const _ = require('lodash')
 const requireConnector = require('./require-connector')
 
 const createConnectorRegistry = ({ defaultConnection, connections }) => {
-  const _connectors = new Map()
+  const connectors = new Map()
 
   return {
     /**
@@ -15,8 +15,8 @@ const createConnectorRegistry = ({ defaultConnection, connections }) => {
     load() {
       for (const connection of _.values(connections)) {
         const { connector } = connection
-        if (!_connectors.has(connector)) {
-          _connectors.set(connector, requireConnector(connector)(strapi))
+        if (!connectors.has(connector)) {
+          connectors.set(connector, requireConnector(connector)(strapi))
         }
       }
     },
@@ -25,27 +25,27 @@ const createConnectorRegistry = ({ defaultConnection, connections }) => {
      * Initialize connectors
      */
     async initialize() {
-      for (const connector of _connectors.values()) {
+      for (const connector of connectors.values()) {
         await connector.initialize()
       }
     },
 
     getAll() {
-      return Array.from(_connectors.values())
+      return Array.from(connectors.values())
     },
 
     get(key) {
-      return _connectors.get(key)
+      return connectors.get(key)
     },
 
     set(key, val) {
-      _connectors.set(key, val)
+      connectors.set(key, val)
       return this
     },
 
     get default() {
       const defaultConnector = connections[defaultConnection].connector
-      return _connectors.get(defaultConnector)
+      return connectors.get(defaultConnector)
     },
 
     getByConnection(connection) {
@@ -56,7 +56,7 @@ const createConnectorRegistry = ({ defaultConnection, connections }) => {
       }
 
       const connectorKey = connections[connection].connector
-      return _connectors.get(connectorKey)
+      return connectors.get(connectorKey)
     },
   }
 }
