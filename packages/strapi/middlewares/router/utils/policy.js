@@ -5,7 +5,7 @@
 const _ = require('lodash')
 
 const GLOBAL_PREFIX = 'global::'
-const PLUGIN_PREFIX = 'plugins::'
+const PLUGIN_PREFIX = 'plugin::'
 const API_PREFIX = 'api::'
 
 const isPolicyFactory = _.isArray

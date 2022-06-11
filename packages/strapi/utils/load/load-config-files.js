@@ -6,7 +6,7 @@ const checkReservedFilename = require('./check-reserved-filename')
  * @param {string} dir - directory from which to load configs
  * @param {string} pattern - glob pattern to search for config files
  */
-const loadConfigFiles = (dir, pattern = 'config/**/*.+(js|json)') =>
+module.exports = (dir, pattern = 'config/**/*.+(js|json)') =>
   loadFiles(dir, pattern, {
     requireFn: requireFileAndParse,
     shouldUseFileNameAsKey: checkReservedFilename,
@@ -16,5 +16,3 @@ const loadConfigFiles = (dir, pattern = 'config/**/*.+(js|json)') =>
       ignore: ['config/**/*.test.js'],
     },
   })
-
-module.exports = loadConfigFiles

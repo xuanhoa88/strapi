@@ -1,59 +1,83 @@
 const _ = require('lodash')
-
-const SINGLE_TYPE = 'singleType'
-const COLLECTION_TYPE = 'collectionType'
+const pluralize = require('pluralize')
 
 const ID_ATTRIBUTE = 'id'
-const PUBLISHED_AT_ATTRIBUTE = 'published_at'
-const CREATED_BY_ATTRIBUTE = 'created_by'
-const UPDATED_BY_ATTRIBUTE = 'updated_by'
-const DP_PUB_STATE_LIVE = 'live'
-const DP_PUB_STATE_PREVIEW = 'preview'
-const DP_PUB_STATES = [DP_PUB_STATE_LIVE, DP_PUB_STATE_PREVIEW]
 
-const constants = {
-  ID_ATTRIBUTE,
-  PUBLISHED_AT_ATTRIBUTE,
-  CREATED_BY_ATTRIBUTE,
-  UPDATED_BY_ATTRIBUTE,
-  DP_PUB_STATES,
-  DP_PUB_STATE_LIVE,
-  DP_PUB_STATE_PREVIEW,
-  SINGLE_TYPE,
-  COLLECTION_TYPE,
+const getTimestamps = (model) => {
+  const timestamps = _.get(model, 'options.timestamps', [])
+
+  if (!_.isArray(timestamps)) {
+    return []
+  }
+
+  return timestamps
 }
 
-const getGlobalId = (model, modelName, prefix) => {
-  const globalId = prefix ? `${prefix}-${modelName}` : modelName
-  return model.globalId || _.upperFirst(_.camelCase(globalId))
+const getNonWritableAttributes = (model = {}) => {
+  const nonWritableAttributes = _.reduce(
+    model.attributes,
+    (acc, attr, attrName) =>
+      attr.writable === false ? acc.concat(attrName) : acc,
+    []
+  )
+
+  return _.uniq([
+    ID_ATTRIBUTE,
+    model.primaryKey,
+    ...getTimestamps(model),
+    ...nonWritableAttributes,
+  ])
 }
+
+const getNonVisibleAttributes = (model) => {
+  const nonVisibleAttributes = _.reduce(
+    model.attributes,
+    (acc, attr, attrName) =>
+      attr.visible === false ? acc.concat(attrName) : acc,
+    []
+  )
+
+  return _.uniq([
+    ID_ATTRIBUTE,
+    model.primaryKey,
+    ...getTimestamps(model),
+    ...nonVisibleAttributes,
+  ])
+}
+
+const getVisibleAttributes = (model) =>
+  _.difference(_.keys(model.attributes), getNonVisibleAttributes(model))
+
+const isVisibleAttribute = (model, attributeName) =>
+  getVisibleAttributes(model).includes(attributeName)
+
+const isPrivateAttribute = (model, attributeName) =>
+  model &&
+  model.privateAttributes &&
+  model.privateAttributes.includes(attributeName)
 
 const createContentType = (
   model,
-  { modelName },
-  { apiName, pluginName } = {}
+  modelName,
+  componentName,
+  isPlugin = false
 ) => {
-  if (apiName) {
-    Object.assign(model, {
-      uid: `api::${apiName}.${modelName}`,
-      apiName,
-      collectionName:
-        model.collectionName || `${apiName}_${modelName}`.toLowerCase(),
-      globalId: getGlobalId(model, modelName, apiName),
-    })
-  } else if (pluginName) {
-    Object.assign(model, {
-      uid: `plugins::${pluginName}.${modelName}`,
-      plugin: pluginName,
-      collectionName:
-        model.collectionName || `${pluginName}_${modelName}`.toLowerCase(),
-      globalId: getGlobalId(model, modelName, pluginName),
-    })
-  }
+  const prefix = isPlugin ? 'plugin' : 'api'
+  Object.assign(model, {
+    uid: `${prefix}::${componentName}.${modelName}`,
+    collectionName:
+      model.collectionName ||
+      _.snakeCase(`${componentName}_${pluralize(modelName)}`),
+    globalId: model.globalId || `${prefix}::${componentName}_${modelName}`,
+    attributes: {},
+  })
 }
 
 module.exports = {
-  constants,
+  isPrivateAttribute,
+  getNonWritableAttributes,
+  getNonVisibleAttributes,
+  getVisibleAttributes,
+  isVisibleAttribute,
   createContentType,
-  getGlobalId,
 }

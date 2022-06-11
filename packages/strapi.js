@@ -9,7 +9,7 @@ const program = new Command()
 const getLocalScript =
   (name) =>
   (...args) => {
-    const cmdPath = resolveCwd.silent(`${__dirname}/strapi-commander/${name}`)
+    const cmdPath = resolveCwd.silent(`${__dirname}/strapi/commands/${name}`)
     if (!cmdPath) {
       console.log(
         `Error loading the local ${yellow(
@@ -90,5 +90,17 @@ program
   .option('-n, --name <name>', 'Helper name')
   .description('Generate a Helper')
   .action(getLocalScript('generate'))
+
+// `$ strapi migrate`
+program
+  .command('migrate <id>')
+  .description('knex migrations CLI')
+  .action(getLocalScript('database/migrate'))
+
+// `$ strapi seed`
+program
+  .command('seed <id>')
+  .description('knex seed CLI')
+  .action(getLocalScript('database/seed'))
 
 program.parseAsync(process.argv)

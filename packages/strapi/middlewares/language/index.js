@@ -24,7 +24,7 @@ module.exports = (strapi) => ({
       strapi.config.middleware.settings.language
 
     const directory = resolve(
-      strapi.config.appPath,
+      strapi.config.appDir,
       strapi.config.paths.config,
       'locales'
     )

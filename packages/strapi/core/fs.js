@@ -9,7 +9,7 @@ module.exports = (strapi) => {
     const filePath = Array.isArray(optPath) ? optPath.join('/') : optPath
 
     return path.join(
-      strapi.dir,
+      strapi.appDir,
       path.normalize(filePath).replace(/^(\/?\.\.?)+/, '')
     )
   }

@@ -51,8 +51,8 @@ const loadOverwrites = async (extensionsDir) => {
 /**
  * Loads the extensions folder
  */
-module.exports = async ({ appPath }) => {
-  const extensionsDir = path.resolve(appPath, 'extensions')
+module.exports = async ({ appDir }) => {
+  const extensionsDir = path.resolve(appDir, 'extensions')
 
   if (!existsSync(extensionsDir)) {
     throw new Error(

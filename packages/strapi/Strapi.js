@@ -9,7 +9,7 @@ const chalk = require('chalk')
 const CLITable = require('cli-table3')
 const { getAbsoluteServerUrl } = require('@strapi/utils')
 const { createLogger } = require('@strapi/logger')
-const { createDatabaseManager } = require('../strapi-database/database-manager')
+const { createDatabaseManager } = require('./database')
 const register = require('./core/register')
 const loadConfiguration = require('./core/load-configuration')
 const loadModules = require('./core/load-modules')
@@ -17,10 +17,12 @@ const initializeMiddlewares = require('./middlewares')
 const initializeHooks = require('./hooks')
 const createStrapiFs = require('./core/fs')
 const createValidator = require('./services/validator')
+const { destroyOnSignal } = require('./utils/signals')
 
 const LIFECYCLES = {
   REGISTER: 'register',
   BOOTSTRAP: 'bootstrap',
+  DESTROY: 'destroy',
 }
 
 /**
@@ -30,11 +32,14 @@ const LIFECYCLES = {
  */
 class Strapi {
   constructor(opts = {}) {
+    destroyOnSignal(this)
+
+    this.appDir = opts.appDir || process.cwd()
+
+    this.isLoaded = false
     this.reload = this.reload()
 
-    this.dir = opts.dir || process.cwd()
-
-    this.config = loadConfiguration(this.dir, opts)
+    this.config = loadConfiguration(this.appDir, opts)
 
     // Expose `koa`.
     this.app = new Koa()
@@ -46,8 +51,6 @@ class Strapi {
     this.log = createLogger(this.config.logger, {})
 
     this.plugins = {}
-
-    this.isLoaded = false
 
     // internal services.
     this.fs = createStrapiFs(this)
@@ -65,7 +68,7 @@ class Strapi {
 
   requireProjectBootstrap() {
     const bootstrapPath = path.resolve(
-      this.dir,
+      this.appDir,
       'config/functions/bootstrap.js'
     )
     if (fs.existsSync(bootstrapPath)) {
@@ -149,7 +152,7 @@ class Strapi {
       }
 
       if (!this.isLoaded) {
-        await this.load()
+        await this.initialize()
       }
 
       // Static files
@@ -170,6 +173,8 @@ class Strapi {
       await new Promise((res) => this.server.destroy(res))
     }
 
+    await this.runLifecyclesFunctions(LIFECYCLES.DESTROY)
+
     await Promise.all(
       _.values(this.plugins).map((plugin) => {
         if (_.has(plugin, 'destroy') && _.isFunction(plugin.destroy)) {
@@ -179,7 +184,9 @@ class Strapi {
       })
     )
 
-    await this.db.destroy()
+    if (_.has(this.db, 'destroy')) {
+      await this.db.destroy()
+    }
 
     delete global.strapi
   }
@@ -242,19 +249,7 @@ class Strapi {
     process.exit(exitCode)
   }
 
-  async load() {
-    this.app.use(async (ctx, next) => {
-      if (
-        ctx.request.url === '/_health' &&
-        ['HEAD', 'GET'].includes(ctx.request.method)
-      ) {
-        ctx.set('strapi', 'You are so French!')
-        ctx.status = 204
-      } else {
-        await next()
-      }
-    })
-
+  async initialize() {
     const modules = await loadModules(this)
 
     this.api = modules.api
@@ -280,6 +275,7 @@ class Strapi {
     await this.freeze()
 
     this.isLoaded = true
+
     return this
   }
 
@@ -352,7 +348,7 @@ class Strapi {
 
   async freeze() {
     Object.freeze(this.config)
-    Object.freeze(this.dir)
+    Object.freeze(this.appDir)
     Object.freeze(this.plugins)
     Object.freeze(this.api)
   }

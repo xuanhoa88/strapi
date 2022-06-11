@@ -1,5 +1,5 @@
 const path = require('path')
-const { templateConfiguration } = require('@strapi/utils')
+const templateConfiguration = require('../template-configuration')
 
 /**
  * Requires a file and eval expression if it is a json

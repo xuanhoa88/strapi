@@ -1,3 +1,3 @@
 const loadFiles = require('../utils/load/load-files')
 
-module.exports = async ({ dir }) => loadFiles(dir, 'helpers/**/*.js')
+module.exports = async ({ appDir }) => loadFiles(appDir, 'helpers/**/*.js')

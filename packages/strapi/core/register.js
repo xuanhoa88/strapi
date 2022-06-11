@@ -6,70 +6,32 @@ module.exports = (strapi) => {
   // Set connections.
   strapi.connections = {}
 
-  const defaultConnection = strapi.config.get('database.defaultConnection')
-
   // Set current connections.
   strapi.config.connections = strapi.config.get('database.connections', {})
 
-  strapi.contentTypes = {}
-
-  _.keys(strapi.api).forEach((apiName) => {
-    const api = strapi.api[apiName]
-    Object.assign(api, {
-      controllers: api.controllers || [],
-      services: api.services || [],
-      models: api.models || [],
-    })
-
-    _.keys(api.controllers).forEach((key) => {
-      const controller = api.controllers[key]
-
+  _.forEach(strapi.api, (api, apiName) => {
+    _.forEach(api.controllers, (controller, key) => {
       Object.assign(controller, {
         uid: `api::${controller.uid || key}`,
       })
     })
 
-    _.keys(api.models || []).forEach((modelName) => {
-      const model = api.models[modelName]
-
+    _.forEach(api.models, (model, key) => {
       // mutate model
-      contentTypesUtils.createContentType(
-        model,
-        { modelName, defaultConnection },
-        { apiName }
-      )
-
-      strapi.contentTypes[model.uid] = model
+      contentTypesUtils.createContentType(model, key, apiName)
     })
   })
 
-  _.keys(strapi.plugins).forEach((pluginName) => {
-    const plugin = strapi.plugins[pluginName]
-    Object.assign(plugin, {
-      controllers: plugin.controllers || [],
-      services: plugin.services || [],
-      models: plugin.models || [],
-    })
-
-    _.keys(plugin.controllers).forEach((key) => {
-      const controller = plugin.controllers[key]
-
+  _.forEach(strapi.plugins, (plugin, pluginName) => {
+    _.forEach(plugin.controllers, (controller, key) => {
       Object.assign(controller, {
         uid: `plugin::${controller.uid || key}`,
       })
     })
 
-    _.keys(plugin.models || []).forEach((modelName) => {
-      const model = plugin.models[modelName]
-
+    _.forEach(plugin.models, (model, key) => {
       // mutate model
-      contentTypesUtils.createContentType(
-        model,
-        { modelName, defaultConnection },
-        { pluginName }
-      )
-
-      strapi.contentTypes[model.uid] = model
+      contentTypesUtils.createContentType(model, key, pluginName, true)
     })
   })
 

@@ -17,11 +17,8 @@ const createConfigProvider = require('./config-provider')
 const CONFIG_PATHS = {
   api: 'api',
   config: 'config',
-  controllers: 'controllers',
-  models: 'models',
   plugins: 'plugins',
   policies: 'policies',
-  services: 'services',
 }
 
 const defaultConfig = {
@@ -49,15 +46,15 @@ const defaultConfig = {
   policies: {},
 }
 
-module.exports = (appPath, initialConfig = {}) => {
+module.exports = (appDir, initialConfig = {}) => {
   const { autoReload = false } = initialConfig
 
-  const pkgJSON = require(path.resolve(appPath, 'package.json'))
+  const pkgJSON = require(path.resolve(appDir || process.cwd(), 'package.json'))
 
-  const configDir = path.resolve(appPath || process.cwd(), 'config')
+  const configDir = path.resolve(appDir || process.cwd(), 'config')
 
   const rootConfig = {
-    appPath,
+    appDir,
     launchedAt: Date.now(),
     paths: CONFIG_PATHS,
     autoReload,

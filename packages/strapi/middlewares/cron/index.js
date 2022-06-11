@@ -23,18 +23,20 @@ module.exports = (strapi) => ({
           const taskValue = strapi.config.functions.cron[taskExpression]
 
           if (_.isFunction(taskValue)) {
-            return cron.scheduleJob(taskExpression, taskValue)
+            return cron.scheduleJob(taskExpression, () => taskValue(strapi))
           }
 
-          const options = _.get(taskValue, 'options', {})
+          if (taskValue && _.isFunction(taskValue.task)) {
+            const options = _.get(taskValue, 'options', {})
 
-          cron.scheduleJob(
-            {
-              rule: taskExpression,
-              ...options,
-            },
-            taskValue.task
-          )
+            cron.scheduleJob(
+              {
+                rule: taskExpression,
+                ...options,
+              },
+              () => taskValue.task(strapi)
+            )
+          }
         }
       )
     }

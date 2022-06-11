@@ -1,8 +1,9 @@
 const path = require('path')
 const fs = require('fs')
 const _ = require('lodash')
-const { templateConfiguration, env } = require('@strapi/utils')
 const { isNotJunk } = require('../../utils/junk')
+const env = require('../../utils/env-helper')
+const templateConfiguration = require('../../utils/template-configuration')
 
 const loadJsFile = (file) => {
   try {

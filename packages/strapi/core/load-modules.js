@@ -5,7 +5,7 @@
  * - Plugins
  * - Hooks
  * - Middlewres
- * - ContentTypes
+ * - Helpers
  */
 
 const _ = require('lodash')

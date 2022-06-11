@@ -46,25 +46,29 @@ const createLoaders = () => {
     )
   }
 
-  function loadLocalMiddlewares(appPath, middlewares) {
+  function loadLocalMiddlewares(appDir, middlewares) {
     return loadMiddlewaresInDir(
-      path.resolve(appPath, 'middlewares'),
+      path.resolve(appDir, 'middlewares'),
       middlewares
     )
   }
 
   async function loadPluginsMiddlewares(plugins, middlewares) {
-    for (const pluginName of plugins) {
-      const dir = path.resolve(
-        findPackagePath(`strapi-plugin-${pluginName}`),
-        'middlewares'
+    Promise.all(
+      _.map(plugins, (pluginName) =>
+        loadMiddlewaresInDir(
+          path.resolve(
+            findPackagePath(`strapi-plugin-${pluginName}`),
+            'middlewares'
+          ),
+          middlewares
+        )
       )
-      await loadMiddlewaresInDir(dir, middlewares)
-    }
+    )
   }
 
-  async function loadLocalPluginsMiddlewares(appPath, middlewares) {
-    const pluginsDir = path.resolve(appPath, 'plugins')
+  async function loadLocalPluginsMiddlewares(appDir, middlewares) {
+    const pluginsDir = path.resolve(appDir, 'plugins')
     if (!fs.existsSync(pluginsDir)) return
 
     const pluginsNames = fs.readdirSync(pluginsDir).filter(isNotJunk)
@@ -74,21 +78,21 @@ const createLoaders = () => {
       const stat = fs.statSync(path.resolve(pluginsDir, pluginFolder))
       if (!stat.isDirectory()) continue
 
-      const dir = path.resolve(pluginsDir, pluginFolder, 'middlewares')
-      await loadMiddlewaresInDir(dir, middlewares)
+      // eslint-disable-next-line no-await-in-loop
+      await loadMiddlewaresInDir(
+        path.resolve(pluginsDir, pluginFolder, 'middlewares'),
+        middlewares
+      )
     }
   }
 
   async function loadMiddlewareDependencies(packages, middlewares) {
     for (const packageName of packages) {
-      const baseDir = path.dirname(
-        require.resolve(`strapi-middleware-${packageName}`)
-      )
+      // eslint-disable-next-line no-await-in-loop
       const files = await glob('*(index|defaults).*(js|json)', {
-        cwd: baseDir,
+        cwd: path.dirname(require.resolve(`strapi-middleware-${packageName}`)),
         absolute: true,
       })
-
       mountMiddleware(packageName, files, middlewares)
     }
   }
@@ -105,22 +109,22 @@ const createLoaders = () => {
 /**
  * Load middlewares
  */
-module.exports = async (strapi) => {
-  const { installedMiddlewares, installedPlugins, appPath } = strapi.config
+module.exports = async ({ config }) => {
+  const { installedMiddlewares, installedPlugins, appDir } = config
 
   const middlewares = {}
 
-  const loaders = createLoaders(strapi)
+  const loaders = createLoaders()
 
   await loaders.loadMiddlewareDependencies(installedMiddlewares, middlewares)
   // internal middlewares
   await loaders.loadInternalMiddlewares(middlewares)
   // local middleware
-  await loaders.loadLocalMiddlewares(appPath, middlewares)
+  await loaders.loadLocalMiddlewares(appDir, middlewares)
   // plugins middlewares
   await loaders.loadPluginsMiddlewares(installedPlugins, middlewares)
   // local plugin middlewares
-  await loaders.loadLocalPluginsMiddlewares(appPath, middlewares)
+  await loaders.loadLocalPluginsMiddlewares(appDir, middlewares)
 
   return middlewares
 }

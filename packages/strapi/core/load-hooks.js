@@ -46,8 +46,8 @@ const loadHooksInDir = async (dir, hook) => {
   })
 }
 
-const loadLocalHooks = (appPath, settings) =>
-  loadHooksInDir(path.resolve(appPath, 'hooks'), settings)
+const loadLocalHooks = (appDir, settings) =>
+  loadHooksInDir(path.resolve(appDir, 'hooks'), settings)
 
 const loadPluginsHooks = async (plugins, settings) => {
   await Promise.all(
@@ -61,8 +61,8 @@ const loadPluginsHooks = async (plugins, settings) => {
   )
 }
 
-const loadLocalPluginsHooks = async (appPath, settings) => {
-  const pluginsDir = path.resolve(appPath, 'plugins')
+const loadLocalPluginsHooks = async (appDir, settings) => {
+  const pluginsDir = path.resolve(appDir, 'plugins')
   if (!fs.existsSync(pluginsDir)) return
 
   const pluginsNames = fs.readdirSync(pluginsDir).filter(isNotJunk)
@@ -95,20 +95,15 @@ const loadHookDependencies = async (installedHooks, settings) => {
 /**
  * Load hooks
  */
-module.exports = async ({
-  installedHooks,
-  installedPlugins,
-  appPath,
-  hook,
-}) => {
+module.exports = async ({ installedHooks, installedPlugins, appDir, hook }) => {
   await Promise.all([
     loadHookDependencies(installedHooks, hook),
     // local hooks
-    loadLocalHooks(appPath, hook),
+    loadLocalHooks(appDir, hook),
     // plugins hooks
     loadPluginsHooks(installedPlugins, hook),
     // local plugin hooks
-    loadLocalPluginsHooks(appPath, hook),
+    loadLocalPluginsHooks(appDir, hook),
   ])
 
   return hook

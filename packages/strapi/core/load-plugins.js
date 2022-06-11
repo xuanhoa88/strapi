@@ -44,7 +44,7 @@ const loadDependencyPlugins = async (config) => {
   return plugins
 }
 
-module.exports = async ({ dir, config }) => {
+module.exports = async ({ appDir, config }) => {
   // internal plugins
   const internalPlugins = await loadLocalPlugins({
     dir: path.resolve(__dirname, '..'),
@@ -52,7 +52,7 @@ module.exports = async ({ dir, config }) => {
   })
 
   // local plugins
-  const localPlugins = await loadLocalPlugins({ dir, config })
+  const localPlugins = await loadLocalPlugins({ dir: appDir, config })
 
   // dependency plugins
   const dependencyPlugins = await loadDependencyPlugins(config)
