@@ -6,8 +6,6 @@ const fs = require('fs')
 const path = require('path')
 const uuid = require('uuid')
 
-const { xlsxBuildByTemplate } = require('./template/utils')
-
 module.exports = {
   async createFromTemplate({ fileName: templateFileName, payload }) {
     try {
@@ -19,8 +17,7 @@ module.exports = {
           templateFileName
         )
       }
-
-      const buffer = await xlsxBuildByTemplate({
+      const buffer = await strapi.helpers.exceljs.xlsxBuildByTemplate({
         payload,
         path: templateFileName,
       })
@@ -39,23 +36,9 @@ module.exports = {
 
       return { fileName: outputFile }
     } catch (err) {
-      if (err.inner) {
-        const allErrors = err.inner.reduce(
-          (errors, currentValidation) =>
-            Object.assign(errors, {
-              [currentValidation.path]: currentValidation.errors[0], // first error is enough for this demo
-            }),
-          {}
-        )
-        console.log('form error:', allErrors)
-        throw allErrors
-      }
-
-      console.log('xlsxHelper error:', err)
       strapi.log.error(err)
+      throw err
     }
-
-    return null
   },
 
   async downloadFile(fileName) {

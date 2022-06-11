@@ -52,7 +52,7 @@ const policyResolvers = [
     get: (policy) => {
       const [, policyWithoutPrefix] = policy.split('::')
       const [api = '', policyName = ''] = policyWithoutPrefix.split('.')
-      return getPolicyIn(_.get(strapi, ['api', api]), policyName)
+      return getPolicyIn(_.get(strapi.api, api), policyName)
     },
   },
   {
@@ -68,7 +68,7 @@ const policyResolvers = [
         policy,
         PLUGIN_PREFIX
       ).split('.')
-      return getPolicyIn(_.get(strapi, ['plugins', plugin]), policyName)
+      return getPolicyIn(_.get(strapi.plugins, plugin), policyName)
     },
   },
   {

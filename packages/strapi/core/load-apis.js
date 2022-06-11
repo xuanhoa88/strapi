@@ -1,11 +1,11 @@
-const { join } = require('path')
+const path = require('path')
 const { existsSync } = require('fs')
 const _ = require('lodash')
 const loadFiles = require('../utils/load/load-files')
 const loadConfig = require('../utils/load/load-config-files')
 
 module.exports = async ({ appDir }) => {
-  const apiDir = join(appDir, 'api')
+  const apiDir = path.join(appDir, 'api')
 
   if (!existsSync(apiDir)) {
     throw new Error(

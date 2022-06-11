@@ -8,14 +8,13 @@ const loadConfig = require('../utils/load/load-config-files')
 const loadLocalPlugins = async ({ dir, config }) => {
   const pluginsDir = path.join(dir, 'plugins')
   if (!fs.existsSync(pluginsDir)) return {}
-
   const [files, configs] = await Promise.all([
     loadFiles(pluginsDir, '{*/!(config)/*.*(js|json),*/package.json}'),
     loadConfig(pluginsDir, '*/config/**/*.+(js|json)'),
   ])
 
   const userConfigs = _.keys(files).reduce((acc, plugin) => {
-    acc[plugin] = { config: config.get(['plugins', plugin], {}) }
+    acc[plugin] = { config: config.get(['plugin', plugin], {}) }
     return acc
   }, {})
   return _.merge(files, configs, userConfigs)
@@ -27,14 +26,16 @@ const loadDependencyPlugins = async (config) => {
   for (const plugin of config.installedPlugins) {
     const pluginPath = findPackagePath(`strapi-plugin-${plugin}`)
 
+    // eslint-disable-next-line no-await-in-loop
     const files = await loadFiles(
       pluginPath,
       '{!(config|node_modules|tests)/*.*(js|json),package.json}'
     )
 
+    // eslint-disable-next-line no-await-in-loop
     const { config: pluginConfig } = await loadConfig(pluginPath)
 
-    const userConfig = config.get(['plugins', plugin], {})
+    const userConfig = config.get(['plugin', plugin], {})
 
     const mergedConfig = _.merge(pluginConfig, userConfig)
 

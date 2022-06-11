@@ -28,8 +28,6 @@ module.exports = async (strapi) => {
       loadHelpers(strapi),
     ])
 
-  // TODO: move this into the appropriate loaders
-
   /**
    * Handle plugin extensions
    */
