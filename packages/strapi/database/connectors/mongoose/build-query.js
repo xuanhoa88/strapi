@@ -5,7 +5,7 @@ const { isMongoId, valueToId } = require('./utils')
 const {
   hasDeepFilters,
   getAssociationFromFieldKey,
-} = require('./utils/build-query')
+} = require('../../utils/build-query')
 
 const sortOrderMapper = {
   asc: 1,

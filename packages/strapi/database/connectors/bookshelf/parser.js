@@ -1,4 +1,4 @@
-const parseType = require('./utils/parse-type')
+const parseType = require('../../utils/parse-type')
 
 const createParser = () => (type, value) => {
   if (value === null) return null

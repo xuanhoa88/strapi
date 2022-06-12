@@ -4,8 +4,8 @@
 
 const _ = require('lodash')
 const pmap = require('p-map')
-const convertRestQueryParams = require('./utils/convert-rest-query-params')
-const buildQueryParams = require('./utils/build-query')
+const convertRestQueryParams = require('../../utils/convert-rest-query-params')
+const { buildQueryParams } = require('../../utils/build-query')
 
 const BATCH_SIZE = 1000
 

@@ -1,5 +1,6 @@
 const _ = require('lodash')
-const parseType = require('./parse-type')
+const mongoose = require('mongoose')
+const parseType = require('../../../utils/parse-type')
 
 const convertType = (name, attr) => {
   if (_.has(attr, 'columnType')) {
@@ -97,7 +98,7 @@ const isMongoId = (value) => {
 }
 
 const valueToId = (value) => {
-  if (Array.isArray(value)) return value.map(valueToId)
+  if (_.isArray(value)) return _.map(value, valueToId)
 
   if (isMongoId(value)) {
     return mongoose.Types.ObjectId(value)

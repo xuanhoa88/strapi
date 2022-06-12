@@ -57,7 +57,7 @@ const castValue = ({ type, value, operator }) => {
  */
 const castInput = ({ type, value, operator }) =>
   _.isArray(value)
-    ? value.map((val) => castValue({ type, operator, value: val }))
+    ? _.map(value, (val) => castValue({ type, operator, value: val }))
     : castValue({ type, operator, value })
 
 /**
@@ -67,7 +67,7 @@ const castInput = ({ type, value, operator }) =>
  * @param {string} options.field - path of relation / attribute
  */
 const normalizeFieldName = ({ model, field }) => {
-  const fieldPath = field.split('.')
+  const fieldPath = _.split(field, '.')
   return _.last(fieldPath) === 'id'
     ? _.initial(fieldPath).concat(model.primaryKey).join('.')
     : fieldPath.join('.')
@@ -79,14 +79,14 @@ const hasDeepFilters = ({ where = [], sort = [] }, { minDepth = 1 } = {}) => {
   // A query uses deep filtering if some of the clauses contains a sort or a match expression on a field of a relation
 
   // We don't use minDepth here because deep sorting is limited to depth 1
-  const hasDeepSortClauses = sort.some(({ field }) => field.includes('.'))
+  const hasDeepSortClauses = _.some(sort, ({ field }) => field.includes('.'))
 
-  const hasDeepWhereClauses = where.some(({ field, operator, value }) => {
+  const hasDeepWhereClauses = _.some(where, ({ field, operator, value }) => {
     if (BOOLEAN_OPERATORS.includes(operator)) {
-      return value.some((clauses) => hasDeepFilters({ where: clauses }))
+      return _.some(value, (clauses) => hasDeepFilters({ where: clauses }))
     }
 
-    return field.split('.').length > minDepth
+    return _.split(field, '.').length > minDepth
   })
 
   return hasDeepSortClauses || hasDeepWhereClauses
@@ -111,7 +111,7 @@ const normalizeWhereClauses = (whereClauses, { model }) =>
         return {
           field,
           operator,
-          value: value.map((clauses) =>
+          value: _.map(value, (clauses) =>
             normalizeWhereClauses(clauses, { model })
           ),
         }
@@ -135,13 +135,13 @@ const normalizeWhereClauses = (whereClauses, { model }) =>
     })
 
 const normalizeSortClauses = (clauses, { model }) => {
-  const normalizedClauses = clauses.map(({ field, order }) => ({
+  const normalizedClauses = _.map(clauses, ({ field, order }) => ({
     field: normalizeFieldName({ model, field }),
     order,
   }))
 
   normalizedClauses.forEach(({ field }) => {
-    const fieldDepth = field.split('.').length - 1
+    const fieldDepth = _.split(field, '.').length - 1
     if (fieldDepth === 1) {
       // Check if the relational field exists
       getAssociationFromFieldKey({ model, field })
@@ -164,11 +164,11 @@ const normalizeSortClauses = (clauses, { model }) => {
  * @param {Object} options.filters - The filters for the query (start, sort, limit, and where clauses)
  * @param {Object} options.rest - In case the database layer requires any other params pass them
  */
-module.exports = ({ connectorQuery, model, filters = {}, ...rest }) => {
+const buildQueryParams = ({ connectorQuery, model, filters = {}, ...rest }) => {
   const { where, sort } = filters
 
   // Validate query clauses
-  if ([where, sort].some(Array.isArray)) {
+  if ([where, sort].some(_.isArray)) {
     if (hasDeepFilters({ where, sort }, { minDepth: 2 })) {
       debug(
         'Deep filtering queries should be used carefully (e.g Can cause performance issues).\nWhen possible build custom routes which will in most case be more optimised.'
@@ -187,4 +187,10 @@ module.exports = ({ connectorQuery, model, filters = {}, ...rest }) => {
 
   // call the ORM's build query implementation
   return connectorQuery.buildQuery({ model, filters, ...rest })
+}
+
+module.exports = {
+  buildQueryParams,
+  hasDeepFilters,
+  getAssociationFromFieldKey,
 }

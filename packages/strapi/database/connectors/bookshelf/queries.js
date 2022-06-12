@@ -4,8 +4,8 @@
 
 const _ = require('lodash')
 const pmap = require('p-map')
-const convertRestQueryParams = require('./utils/convert-rest-query-params')
-const buildQuery = require('./utils/build-query')
+const convertRestQueryParams = require('../../utils/convert-rest-query-params')
+const { buildQueryParams } = require('../../utils/build-query')
 const { escapeQuery } = require('./utils/string-formatting')
 
 const BATCH_SIZE = 1000
@@ -94,7 +94,7 @@ function createQueryBuilder({ model, connectorQuery }) {
    */
   function find(params, populate, { transacting } = {}) {
     const filters = convertRestQueryParams(params)
-    const query = buildQuery({ model, filters })
+    const query = buildQueryParams({ model, filters })
 
     return model
       .query(query)
@@ -122,7 +122,7 @@ function createQueryBuilder({ model, connectorQuery }) {
     const filters = pickCountFilters(convertRestQueryParams(params))
 
     return model
-      .query(buildQuery({ model, filters }))
+      .query(buildQueryParams({ model, filters }))
       .count({ transacting })
       .then(Number)
   }
@@ -201,7 +201,7 @@ function createQueryBuilder({ model, connectorQuery }) {
 
     return model
       .query((qb) => qb.where(buildSearchQuery({ model, params })))
-      .query(buildQuery({ model, filters }))
+      .query(buildQueryParams({ model, filters }))
       .fetchAll({ withRelated: populate })
       .then((results) => results.toJSON())
   }
@@ -212,7 +212,7 @@ function createQueryBuilder({ model, connectorQuery }) {
 
     return model
       .query((qb) => qb.where(buildSearchQuery({ model, params })))
-      .query(buildQuery({ model, filters }))
+      .query(buildQueryParams({ model, filters }))
       .count()
       .then(Number)
   }

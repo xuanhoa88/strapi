@@ -9,6 +9,14 @@ const replaceIdByPrimaryKey = (params, model) => {
     delete newParams.id
     newParams[model.primaryKey] = params[model.primaryKey] || params.id
   }
+
+  if (_.has(params, '_id')) {
+    // eslint-disable-next-line no-underscore-dangle
+    delete newParams._id
+    // eslint-disable-next-line no-underscore-dangle
+    newParams[model.primaryKey] = params[model.primaryKey] || params._id
+  }
+
   return newParams
 }
 

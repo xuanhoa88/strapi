@@ -1,4 +1,5 @@
 const util = require('util')
+const _ = require('lodash')
 
 module.exports = (mongoose) => {
   const { Schema } = mongoose
@@ -55,7 +56,7 @@ module.exports = (mongoose) => {
       return mongo.Long.fromNumber(val)
     }
 
-    if (!Array.isArray(val) && val.toString) {
+    if (!_.isArray(val) && val.toString) {
       return mongo.Long.fromString(val.toString())
     }
 

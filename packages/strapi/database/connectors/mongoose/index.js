@@ -7,7 +7,7 @@ const url = require('url')
 const _ = require('lodash')
 const mongoose = require('mongoose')
 const { Mongoose } = require('./utils/data-types')(mongoose)
-const buildQueryParams = require('./build-query')
+const { buildQueryParams } = require('../../utils/build-query')
 const mountModels = require('./mount-models')
 const createQueryBuilder = require('./queries')
 

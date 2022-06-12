@@ -10,7 +10,7 @@ const Bookshelf = require('./lib/bookshelf')
 const mountModels = require('./mount-models')
 const { createQueryBuilder } = require('./queries')
 const initKnex = require('./knex')
-const buildQueryParams = require('./utils/build-query')
+const { buildQueryParams } = require('../../utils/build-query')
 
 const DB_CONNECTOR = 'bookshelf'
 
