@@ -58,10 +58,7 @@ function generateRoutes(name) {
  */
 
 module.exports = (scope) => {
-  let routes = []
-  if (!scope.args.plugin) {
-    routes = generateRoutes(scope.name)
-  }
+  let routes = generateRoutes(scope.name)
 
   // if routes.json already exists, then merge
   if (fs.existsSync(scope.rootPath)) {

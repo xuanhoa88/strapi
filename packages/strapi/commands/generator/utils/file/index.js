@@ -28,7 +28,7 @@ module.exports = (options, next) => {
   })
 
   const missingOpts = _.difference(['contents', 'rootPath'], _.keys(options))
-  if (missingOpts.length) {
+  if (missingOpts.length > 0) {
     return next.invalid(missingOpts)
   }
 

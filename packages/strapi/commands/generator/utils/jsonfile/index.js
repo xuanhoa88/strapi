@@ -27,8 +27,7 @@ module.exports = (options, handlers) => {
   })
 
   const missingOpts = _.difference(['rootPath', 'data'], _.keys(options))
-
-  if (missingOpts.length) {
+  if (missingOpts.length > 0) {
     return handlers.invalid(missingOpts)
   }
 
@@ -39,7 +38,6 @@ module.exports = (options, handlers) => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true })
     }
-
     fs.writeFile(
       rootPath,
       JSON.stringify(options.data, null, 2),

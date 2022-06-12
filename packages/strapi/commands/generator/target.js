@@ -224,6 +224,7 @@ module.exports = (options, next) => {
   const { recursiveGenerate } = options
 
   const maxResolves = 5
+  // eslint-disable-next-line no-underscore-dangle
   let _resolves = 0
 
   asyncUntil(
@@ -286,13 +287,14 @@ module.exports = (options, next) => {
       }
 
       if (target.jsonfile) {
-        if (_.isObject(target.jsonfile)) {
-          scope = mergeSubtargetScope(scope, target.jsonfile)
-        } else if (_.isFunction(target.jsonfile)) {
+        if (_.isFunction(target.jsonfile)) {
           scope = _.merge(scope, {
             data: target.jsonfile(scope),
           })
+        } else if (_.isPlainObject(target.jsonfile)) {
+          scope = mergeSubtargetScope(scope, target.jsonfile)
         }
+
         return jsonFileUtils(scope, sb)
       }
 
@@ -300,6 +302,7 @@ module.exports = (options, next) => {
       // Now that the generator definition has been resolved,
       // call this method recursively on it, passing along our
       // callback.
+      // eslint-disable-next-line no-underscore-dangle
       if (++scope._depth > scope.maxHops) {
         return sb(
           new Error(

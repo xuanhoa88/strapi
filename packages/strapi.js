@@ -61,9 +61,7 @@ program
 // `$ strapi generate:api`
 program
   .command('generate:api <id> [attributes...]')
-  .option('-a, --api <api>', 'API name to generate the files in')
   .option('-c, --connection <connection>', 'The name of the connection to use')
-  .option('--draft-and-publish', 'Enable draft/publish', false)
   .description('Generate a basic API')
   .action((id, attributes, cliArguments) => {
     cliArguments.attributes = attributes

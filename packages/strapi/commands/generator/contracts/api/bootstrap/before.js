@@ -29,18 +29,21 @@ module.exports = (scope, cb) => {
     route: _.kebabCase(pluralize(scope.id)),
   })
 
-  let filePath
-  if (scope.args.api) {
-    filePath = `./api/${scope.args.api}`
-  } else {
-    filePath = `./api/${name}`
-  }
+  const filePath = `./api/${name}`
 
   // Take another pass to take advantage of the defaults absorbed in previous passes.
   _.defaults(scope, {
     filename: `${name}.js`,
     filePath,
   })
+
+  // Set collectionName
+  scope.collectionName = _.has(scope.args, 'collectionName')
+    ? scope.args.collectionName
+    : _.snakeCase(pluralize(name))
+
+  // Set connection
+  scope.connection = _.get(scope.args, 'connection', undefined)
 
   // Trigger callback with no error to proceed.
   return cb.success()
