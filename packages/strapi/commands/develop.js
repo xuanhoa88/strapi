@@ -2,6 +2,7 @@ const cluster = require('cluster')
 const chokidar = require('chokidar')
 const { createLogger } = require('@strapi/logger')
 const loadConfiguration = require('../core/load-configuration')
+const rc = require('../utils/rc')
 const strapi = require('../Strapi')
 
 /**
@@ -64,10 +65,15 @@ function watchFileChanges({
  * `$ strapi develop`
  *
  */
-module.exports = async ({ polling }) => {
+module.exports = async ({ polling, iniFile }) => {
   const appDir = process.cwd()
   const config = loadConfiguration(appDir)
   const logger = createLogger(config.logger, {})
+
+  let strapiOptions = { appDir }
+  if (iniFile) {
+    strapiOptions = rc(iniFile)
+  }
 
   try {
     if (cluster.isMaster) {
@@ -94,7 +100,7 @@ module.exports = async ({ polling }) => {
 
     if (cluster.isWorker) {
       const strapiInstance = strapi({
-        appDir,
+        ...strapiOptions,
         autoReload: true,
       })
       await strapiInstance.start()

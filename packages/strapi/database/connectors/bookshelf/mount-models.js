@@ -1,6 +1,5 @@
 const _ = require('lodash')
 const debug = require('debug')('strapi-database:bookshelf')
-const contentTypesUtils = require('./utils/content-types')
 const { createParser } = require('./parser')
 const { createFormatter } = require('./formatter')
 const populateFetch = require('./populate')
@@ -49,6 +48,7 @@ module.exports = async (
 
           return acc
         }, {}),
+        lifecycles: {},
       },
       definition
     )
@@ -100,25 +100,27 @@ module.exports = async (
           }
         })
 
-        const lifecycle = {
-          creating: 'beforeCreate',
-          created: 'afterCreate',
-          destroying: 'beforeDestroy',
-          destroyed: 'afterDestroy',
-          updating: 'beforeUpdate',
-          updated: 'afterUpdate',
-          fetching: 'beforeFetch',
-          'fetching:collection': 'beforeFetchAll',
-          fetched: 'afterFetch',
-          'fetched:collection': 'afterFetchAll',
-          saving: 'beforeSave',
-          saved: 'afterSave',
-        }
-        _.forEach(lifecycle, (method, key) => {
-          if (_.isFunction(target[model][method])) {
-            this.on(key, target[model][method])
+        _.forEach(
+          {
+            creating: 'beforeCreate',
+            created: 'afterCreate',
+            destroying: 'beforeDestroy',
+            destroyed: 'afterDestroy',
+            updating: 'beforeUpdate',
+            updated: 'afterUpdate',
+            fetching: 'beforeFetch',
+            'fetching:collection': 'beforeFetchAll',
+            fetched: 'afterFetch',
+            'fetched:collection': 'afterFetchAll',
+            saving: 'beforeSave',
+            saved: 'afterSave',
+          },
+          (method, key) => {
+            if (_.isFunction(target[model].lifecycles[method])) {
+              this.on(key, target[model].lifecycles[method])
+            }
           }
-        })
+        )
       }
 
       loadedModel.hidden = _.keys(
@@ -155,9 +157,6 @@ module.exports = async (
 
       // Push attributes to be aware of model schema.
       target[model]._attributes = definition.attributes
-      target[model].privateAttributes = contentTypesUtils.getPrivateAttributes(
-        target[model]
-      )
     } catch (err) {
       if (err instanceof TypeError || err instanceof ReferenceError) {
         debug(`Impossible to register the '${model}' model.`)

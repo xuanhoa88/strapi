@@ -2,7 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const _ = require('lodash')
 const { isNotJunk } = require('../../utils/junk')
-const env = require('../../utils/env-helper')
+const env = require('../../utils/dotenv')
 const templateConfiguration = require('../../utils/template-configuration')
 
 const loadJsFile = (file) => {

@@ -120,7 +120,7 @@ const convertExtraRootParams = (params) =>
 const convertWhereParams = (whereParams) => {
   const finalWhere = []
 
-  if (Array.isArray(whereParams)) {
+  if (_.isArray(whereParams)) {
     return whereParams.reduce(
       (acc, whereParam) => acc.concat(convertWhereParams(whereParam)),
       []

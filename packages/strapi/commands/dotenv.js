@@ -9,7 +9,7 @@ const _ = require('lodash')
 const { createLogger } = require('@strapi/logger')
 const loadConfiguration = require('../core/load-configuration')
 
-const serialize = require('./dotenv/serialize')
+const serialize = require('../utils/dotenv/serialize')
 
 /**
  * `$ strapi generate`

@@ -17,12 +17,14 @@ class LifecycleManager {
   async run(action, model, ...args) {
     for (const lifecycle of this.lifecycles) {
       if (!_.isNil(lifecycle.model) && lifecycle.model !== model.uid) {
+        // eslint-disable-next-line no-continue
         continue
       }
 
       if (_.isFunction(lifecycle[action])) {
         debug(`Run lifecycle ${action} for model ${model.uid}`)
 
+        // eslint-disable-next-line no-await-in-loop
         await lifecycle[action](...args)
       }
     }

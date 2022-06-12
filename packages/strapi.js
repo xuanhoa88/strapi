@@ -37,22 +37,23 @@ program.storeOptionsAsProperties(false).allowUnknownOption(true)
 program.helpOption('-h, --help', 'Display help for command')
 program.addHelpCommand('help [command]', 'Display help for command')
 
-// `$ strapi env`
+// `$ strapi env:update`
 program
-  .command('env')
+  .command('env:update')
   .description('Set ENV in Strapi application')
   .action(getLocalScript('dotenv'))
 
 // `$ strapi production`
 program
   .command('production')
+  .option('-f, --ini-file <iniFile>', 'INI configuration file')
   .description('Start your Strapi application')
   .action(getLocalScript('production'))
 
 // `$ strapi develop`
 program
   .command('develop')
-  .alias('dev')
+  .option('-f, --ini-file <iniFile>', 'INI configuration file')
   .option('--polling', 'Watching file changes in network directories', false)
   .description('Start your application in development mode')
   .action(getLocalScript('develop'))

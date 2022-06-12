@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   api:
@@ -15,18 +15,17 @@ services:
       - "app-data:/opt/storage/strapi"
       - "../node_modules:/usr/src/app/node_modules"
       - "../.:/usr/src/app"
-    restart: unless-stopped
-    tty: true
     networks:
       - app-network
-    depends_on:
-      - mysql
+    restart: unless-stopped
+    tty: true
+    profiles: [ "api" ]
 
   mysql:
     image: mysql:8.0.29
     container_name: mysql
     ports:
-      - "33060:3306"
+      - "3306:3306"
     volumes:
       - "mysql-data:/opt/storage/mysql"
     environment:
@@ -34,14 +33,109 @@ services:
       - MYSQL_USER=${MYSQL_USER:-strapi}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD:-strapi}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-strapi}
-    restart: always
     networks:
       - app-network
+    restart: unless-stopped
     tty: true
+    profiles: [ "mysql", "mysqladmin" ]
+
+  mysqladmin:
+    image: phpmyadmin/phpmyadmin:5.2.0
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: "3306"
+      PMA_ARBITRARY: 1
+      MYSQL_ROOT_PASSWORD: strapi
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+    restart: unless-stopped
+    tty: true
+    profiles: [ "mysqladmin" ]
+
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - "mongodb-data:/opt/storage/mongodb/db"
+      - "mongodb-config:/opt/storage/mongodb/configdb"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=strapi
+      - MONGO_INITDB_ROOT_PASSWORD=strapi
+    command: [ --auth ]
+    networks:
+      - app-network
+    restart: unless-stopped
+    tty: true
+    profiles: [ "mongodb", "mongoadmin" ]
+
+  mongoadmin:
+    image: mongo-express:latest
+    container_name: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: strapi
+      ME_CONFIG_MONGODB_ADMINPASSWORD: strapi
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: "27017"
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+    tty: true
+    profiles: [ "mongoadmin" ]
+
+  postgres:
+    image: postgres:14.3-alpine3.16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-strapi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-strapi}
+      PGDATA: /opt/storage/postgres
+    volumes:
+      - "postgres-data:/opt/storage/postgres"
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    restart: unless-stopped
+    tty: true
+    profiles: [ "postgres", "pgadmin" ]
+
+  pgadmin:
+    image: dpage/pgadmin4:6.10
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-strapi@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-strapi}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - "pgadmin-data:/opt/storage/pgadmin"
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - app-network
+    restart: unless-stopped
+    tty: true
+    depends_on:
+      - postgres
+    profiles: [ "pgadmin" ]
 
 volumes:
   app-data:
   mysql-data:
+  mongodb-data:
+  mongodb-config:
+  postgres-data:
+  pgadmin-data:
 
 
 networks:

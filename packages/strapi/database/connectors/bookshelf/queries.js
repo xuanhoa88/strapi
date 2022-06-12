@@ -101,7 +101,6 @@ function createQueryBuilder({ model, connectorQuery }) {
       .fetchAll({
         withRelated: populate,
         transacting,
-        publicationState: filters.publicationState,
       })
       .then((results) => results.toJSON())
   }
